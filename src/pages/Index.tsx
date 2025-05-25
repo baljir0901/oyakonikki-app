@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +13,6 @@ const Index = () => {
 
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, just simulate authentication
     setIsAuthenticated(true);
   };
 
@@ -23,68 +21,70 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center p-4 safe-area-inset">
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader className="text-center pb-4">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center">
-              <Heart className="w-8 h-8 text-white" />
+            <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center shadow-lg">
+              <Heart className="w-10 h-10 text-white" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-800">
+          <CardTitle className="text-3xl font-bold text-gray-800 mb-2">
             Oyako Nikki
           </CardTitle>
-          <CardDescription className="text-lg text-gray-600">
+          <CardDescription className="text-xl text-gray-600 font-medium">
             親子日記
           </CardDescription>
           <p className="text-sm text-gray-500 mt-2">
             Connect hearts through daily stories
           </p>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleAuth} className="space-y-4">
-            <div className="flex gap-2 mb-4">
-              <Button
-                type="button"
-                variant={userType === 'parent' ? 'default' : 'outline'}
-                onClick={() => setUserType('parent')}
-                className="flex-1"
-              >
-                <Users className="w-4 h-4 mr-2" />
-                Parent
-              </Button>
-              <Button
-                type="button"
-                variant={userType === 'child' ? 'default' : 'outline'}
-                onClick={() => setUserType('child')}
-                className="flex-1"
-              >
-                <BookOpen className="w-4 h-4 mr-2" />
-                Child
-              </Button>
-            </div>
-            
+        <CardContent className="space-y-6">
+          <div className="flex gap-3 mb-6">
+            <Button
+              type="button"
+              variant={userType === 'parent' ? 'default' : 'outline'}
+              onClick={() => setUserType('parent')}
+              className="flex-1 h-12 text-base"
+            >
+              <Users className="w-5 h-5 mr-2" />
+              Parent
+            </Button>
+            <Button
+              type="button"
+              variant={userType === 'child' ? 'default' : 'outline'}
+              onClick={() => setUserType('child')}
+              className="flex-1 h-12 text-base"
+            >
+              <BookOpen className="w-5 h-5 mr-2" />
+              Child
+            </Button>
+          </div>
+          
+          <form onSubmit={handleAuth} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-base">Email</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="Enter your email"
+                className="h-12 text-base"
                 required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-base">Password</Label>
               <Input
                 id="password"
                 type="password"
                 placeholder="Enter your password"
+                className="h-12 text-base"
                 required
               />
             </div>
             
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full h-12 text-base font-medium">
               {isLogin ? 'Sign In' : 'Sign Up'}
             </Button>
             
@@ -94,7 +94,7 @@ const Index = () => {
               type="button"
               variant="ghost"
               onClick={() => setIsLogin(!isLogin)}
-              className="w-full"
+              className="w-full h-12 text-base"
             >
               {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
             </Button>
@@ -109,38 +109,38 @@ const DashboardView = ({ userType }: { userType: 'parent' | 'child' }) => {
   const [activeTab, setActiveTab] = useState('home');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-md mx-auto px-4 py-3">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 safe-area-inset">
+      {/* Mobile-optimized Header */}
+      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
+        <div className="px-4 py-4 safe-area-inset-top">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-lg font-semibold text-gray-800">
+              <h1 className="text-xl font-bold text-gray-800">
                 Oyako Nikki
               </h1>
               <p className="text-sm text-gray-500">
                 {userType === 'parent' ? 'Parent View' : 'Child View'}
               </p>
             </div>
-            <div className="w-8 h-8 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center">
-              <Heart className="w-4 h-4 text-white" />
+            <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center">
+              <Heart className="w-5 h-5 text-white" />
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-md mx-auto px-4 py-6">
+      {/* Main Content with proper mobile spacing */}
+      <main className="px-4 py-6 pb-24">
         {activeTab === 'home' && <HomeTab userType={userType} />}
         {activeTab === 'write' && <WriteTab userType={userType} />}
         {activeTab === 'calendar' && <CalendarTab />}
         {activeTab === 'profile' && <ProfileTab userType={userType} />}
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
-        <div className="max-w-md mx-auto px-4">
-          <div className="flex justify-around py-2">
+      {/* Mobile-optimized Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg safe-area-inset-bottom">
+        <div className="px-4 py-2">
+          <div className="flex justify-around">
             {[
               { id: 'home', icon: Heart, label: 'Home' },
               { id: 'write', icon: BookOpen, label: 'Write' },
@@ -150,14 +150,14 @@ const DashboardView = ({ userType }: { userType: 'parent' | 'child' }) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
+                className={`flex flex-col items-center py-3 px-4 rounded-xl transition-all duration-200 min-w-0 flex-1 ${
                   activeTab === tab.id
-                    ? 'text-purple-600 bg-purple-50'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'text-purple-600 bg-purple-50 scale-105'
+                    : 'text-gray-500 hover:text-gray-700 active:bg-gray-50'
                 }`}
               >
-                <tab.icon className="w-5 h-5" />
-                <span className="text-xs mt-1">{tab.label}</span>
+                <tab.icon className="w-6 h-6 mb-1" />
+                <span className="text-xs font-medium">{tab.label}</span>
               </button>
             ))}
           </div>
@@ -188,37 +188,37 @@ const HomeTab = ({ userType }: { userType: 'parent' | 'child' }) => {
   ];
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">
+        <h2 className="text-2xl font-bold text-gray-800 mb-3">
           {userType === 'parent' ? "Your child's stories" : "Your family diary"}
         </h2>
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-600">
           {userType === 'parent' 
             ? "See how your child is feeling each day" 
             : "Share your daily adventures"}
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {sampleEntries.map((entry) => (
-          <Card key={entry.id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">{entry.mood}</span>
+          <Card key={entry.id} className="hover:shadow-lg transition-all duration-200 active:scale-95">
+            <CardContent className="p-5">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{entry.mood}</span>
                   <div>
-                    <p className="font-medium text-gray-800">{entry.author}</p>
+                    <p className="font-semibold text-gray-800 text-lg">{entry.author}</p>
                     <p className="text-sm text-gray-500">{entry.date}</p>
                   </div>
                 </div>
                 {entry.isOwn && (
-                  <span className="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded-full">
+                  <span className="bg-purple-100 text-purple-700 text-xs px-3 py-1 rounded-full font-medium">
                     You
                   </span>
                 )}
               </div>
-              <p className="text-gray-700 text-sm">{entry.excerpt}</p>
+              <p className="text-gray-700 leading-relaxed">{entry.excerpt}</p>
             </CardContent>
           </Card>
         ))}
@@ -241,12 +241,12 @@ const WriteTab = ({ userType }: { userType: 'parent' | 'child' }) => {
   ];
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">
+        <h2 className="text-2xl font-bold text-gray-800 mb-3">
           How are you feeling today?
         </h2>
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-600">
           {userType === 'child' 
             ? "Share your day with your family" 
             : "Write about your day"}
@@ -254,31 +254,31 @@ const WriteTab = ({ userType }: { userType: 'parent' | 'child' }) => {
       </div>
 
       <Card>
-        <CardContent className="p-4 space-y-4">
+        <CardContent className="p-6 space-y-6">
           <div>
-            <Label className="text-sm font-medium text-gray-700 mb-3 block">
+            <Label className="text-lg font-semibold text-gray-700 mb-4 block">
               Pick your mood
             </Label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-4">
               {moods.map((moodOption) => (
                 <button
                   key={moodOption.emoji}
                   onClick={() => setMood(moodOption.emoji)}
-                  className={`flex flex-col items-center p-3 rounded-lg border-2 transition-colors ${
+                  className={`flex flex-col items-center p-4 rounded-xl border-2 transition-all duration-200 active:scale-95 ${
                     mood === moodOption.emoji
-                      ? 'border-purple-400 bg-purple-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-purple-400 bg-purple-50 shadow-md'
+                      : 'border-gray-200 hover:border-gray-300 active:bg-gray-50'
                   }`}
                 >
-                  <span className="text-2xl mb-1">{moodOption.emoji}</span>
-                  <span className="text-xs text-gray-600">{moodOption.label}</span>
+                  <span className="text-3xl mb-2">{moodOption.emoji}</span>
+                  <span className="text-sm text-gray-600 font-medium">{moodOption.label}</span>
                 </button>
               ))}
             </div>
           </div>
 
           <div>
-            <Label htmlFor="diary-entry" className="text-sm font-medium text-gray-700 mb-2 block">
+            <Label htmlFor="diary-entry" className="text-lg font-semibold text-gray-700 mb-3 block">
               Write about your day
             </Label>
             <textarea
@@ -289,12 +289,15 @@ const WriteTab = ({ userType }: { userType: 'parent' | 'child' }) => {
                 ? "What happened today? How did you feel?"
                 : "Share your thoughts about today..."
               }
-              className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              rows={6}
+              className="w-full p-4 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base leading-relaxed"
+              rows={8}
             />
           </div>
 
-          <Button className="w-full" disabled={!mood || !entry.trim()}>
+          <Button 
+            className="w-full h-14 text-lg font-semibold" 
+            disabled={!mood || !entry.trim()}
+          >
             Save Today's Entry
           </Button>
         </CardContent>
@@ -305,22 +308,22 @@ const WriteTab = ({ userType }: { userType: 'parent' | 'child' }) => {
 
 const CalendarTab = () => {
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">
+        <h2 className="text-2xl font-bold text-gray-800 mb-3">
           Your Diary Calendar
         </h2>
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-600">
           Look back at your family's memories
         </p>
       </div>
 
       <Card>
-        <CardContent className="p-4">
-          <div className="text-center py-8">
-            <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">Calendar view coming soon!</p>
-            <p className="text-sm text-gray-400 mt-2">
+        <CardContent className="p-8">
+          <div className="text-center py-12">
+            <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-6" />
+            <p className="text-lg text-gray-500 mb-2">Calendar view coming soon!</p>
+            <p className="text-sm text-gray-400">
               You'll be able to browse all your diary entries by date
             </p>
           </div>
@@ -332,21 +335,21 @@ const CalendarTab = () => {
 
 const ProfileTab = ({ userType }: { userType: 'parent' | 'child' }) => {
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">
+        <h2 className="text-2xl font-bold text-gray-800 mb-3">
           Profile Settings
         </h2>
       </div>
 
       <Card>
-        <CardContent className="p-4 space-y-4">
+        <CardContent className="p-6 space-y-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center">
-              <Heart className="w-8 h-8 text-white" />
+            <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center">
+              <Heart className="w-10 h-10 text-white" />
             </div>
             <div>
-              <p className="font-medium text-gray-800">
+              <p className="font-semibold text-gray-800 text-lg">
                 {userType === 'parent' ? 'Parent Account' : 'Child Account'}
               </p>
               <p className="text-sm text-gray-500">user@example.com</p>
@@ -355,32 +358,32 @@ const ProfileTab = ({ userType }: { userType: 'parent' | 'child' }) => {
 
           {userType === 'parent' && (
             <div className="pt-4 border-t">
-              <h3 className="font-medium text-gray-800 mb-3">Family Connections</h3>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <h3 className="font-semibold text-gray-800 mb-4 text-lg">Family Connections</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                   <div>
-                    <p className="font-medium text-sm">Yuki</p>
-                    <p className="text-xs text-gray-500">Connected child</p>
+                    <p className="font-semibold">Yuki</p>
+                    <p className="text-sm text-gray-500">Connected child</p>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="h-10">
                     Manage
                   </Button>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full h-12">
                   Add Another Child
                 </Button>
               </div>
             </div>
           )}
 
-          <div className="pt-4 border-t space-y-2">
-            <Button variant="outline" className="w-full justify-start">
+          <div className="pt-4 border-t space-y-3">
+            <Button variant="outline" className="w-full justify-start h-12 text-base">
               Privacy Settings
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start h-12 text-base">
               Notification Settings
             </Button>
-            <Button variant="outline" className="w-full justify-start text-red-600 hover:text-red-700">
+            <Button variant="outline" className="w-full justify-start h-12 text-base text-red-600 hover:text-red-700">
               Sign Out
             </Button>
           </div>
