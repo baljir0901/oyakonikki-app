@@ -2,11 +2,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Heart, BookOpen, Users } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { EmailAuthForm } from "./auth/EmailAuthForm";
+import { SocialAuthButtons } from "./auth/SocialAuthButtons";
 
 interface AuthFormProps {
   setIsAuthenticated: (value: boolean) => void;
@@ -16,19 +16,18 @@ interface AuthFormProps {
 
 export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthFormProps) => {
   const [isLogin, setIsLogin] = useState(true);
-  const { toast } = useToast();
+  const { signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
 
-  const handleAuth = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsAuthenticated(true);
-    toast({
-      title: "ログイン成功",
-      description: `${userType === 'parent' ? '保護者' : 'お子様'}としてログインしました`,
-    });
+  const handleEmailAuth = async (email: string, password: string, isLogin: boolean) => {
+    if (isLogin) {
+      return await signInWithEmail(email, password);
+    } else {
+      return await signUpWithEmail(email, password);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center p-4 safe-area-inset">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center p-4 safe-area-inset font-japanese">
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center pb-4">
           <div className="flex justify-center mb-4">
@@ -68,44 +67,30 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
             </Button>
           </div>
           
-          <form onSubmit={handleAuth} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-base">メールアドレス</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="メールアドレスを入力"
-                className="h-12 text-base"
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-base">パスワード</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="パスワードを入力"
-                className="h-12 text-base"
-                required
-              />
-            </div>
-            
-            <Button type="submit" className="w-full h-12 text-base font-medium">
-              {isLogin ? 'ログイン' : '新規登録'}
-            </Button>
-            
+          <SocialAuthButtons onGoogleAuth={signInWithGoogle} />
+          
+          <div className="relative">
             <Separator />
-            
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setIsLogin(!isLogin)}
-              className="w-full h-12 text-base"
-            >
-              {isLogin ? "アカウントをお持ちでない方は新規登録" : "すでにアカウントをお持ちの方はログイン"}
-            </Button>
-          </form>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="bg-white px-3 text-sm text-gray-500">または</span>
+            </div>
+          </div>
+          
+          <EmailAuthForm 
+            isLogin={isLogin}
+            onEmailAuth={handleEmailAuth}
+          />
+          
+          <Separator />
+          
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setIsLogin(!isLogin)}
+            className="w-full h-12 text-base"
+          >
+            {isLogin ? "アカウントをお持ちでない方は新規登録" : "すでにアカウントをお持ちの方はログイン"}
+          </Button>
         </CardContent>
       </Card>
     </div>
