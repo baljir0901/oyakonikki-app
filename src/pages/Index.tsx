@@ -1,23 +1,30 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Heart, BookOpen, Users, Calendar } from "lucide-react";
+import { Heart, BookOpen, Users, Calendar, Settings, Bell, Shield, LogOut, UserPlus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [userType, setUserType] = useState<'parent' | 'child'>('parent');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { toast } = useToast();
 
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
     setIsAuthenticated(true);
+    toast({
+      title: "ログイン成功",
+      description: `${userType === 'parent' ? '保護者' : 'お子様'}としてログインしました`,
+    });
   };
 
   if (isAuthenticated) {
-    return <DashboardView userType={userType} />;
+    return <DashboardView userType={userType} setIsAuthenticated={setIsAuthenticated} />;
   }
 
   return (
@@ -30,13 +37,13 @@ const Index = () => {
             </div>
           </div>
           <CardTitle className="text-3xl font-bold text-gray-800 mb-2">
-            Oyako Nikki
+            親子日記
           </CardTitle>
           <CardDescription className="text-xl text-gray-600 font-medium">
-            親子日記
+            Oyako Nikki
           </CardDescription>
           <p className="text-sm text-gray-500 mt-2">
-            Connect hearts through daily stories
+            毎日の物語で心をつなぐ
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -48,7 +55,7 @@ const Index = () => {
               className="flex-1 h-12 text-base"
             >
               <Users className="w-5 h-5 mr-2" />
-              Parent
+              保護者
             </Button>
             <Button
               type="button"
@@ -57,35 +64,35 @@ const Index = () => {
               className="flex-1 h-12 text-base"
             >
               <BookOpen className="w-5 h-5 mr-2" />
-              Child
+              お子様
             </Button>
           </div>
           
           <form onSubmit={handleAuth} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-base">Email</Label>
+              <Label htmlFor="email" className="text-base">メールアドレス</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="メールアドレスを入力"
                 className="h-12 text-base"
                 required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-base">Password</Label>
+              <Label htmlFor="password" className="text-base">パスワード</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="パスワードを入力"
                 className="h-12 text-base"
                 required
               />
             </div>
             
             <Button type="submit" className="w-full h-12 text-base font-medium">
-              {isLogin ? 'Sign In' : 'Sign Up'}
+              {isLogin ? 'ログイン' : '新規登録'}
             </Button>
             
             <Separator />
@@ -96,7 +103,7 @@ const Index = () => {
               onClick={() => setIsLogin(!isLogin)}
               className="w-full h-12 text-base"
             >
-              {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+              {isLogin ? "アカウントをお持ちでない方は新規登録" : "すでにアカウントをお持ちの方はログイン"}
             </Button>
           </form>
         </CardContent>
@@ -105,8 +112,17 @@ const Index = () => {
   );
 };
 
-const DashboardView = ({ userType }: { userType: 'parent' | 'child' }) => {
+const DashboardView = ({ userType, setIsAuthenticated }: { userType: 'parent' | 'child', setIsAuthenticated: (value: boolean) => void }) => {
   const [activeTab, setActiveTab] = useState('home');
+  const { toast } = useToast();
+
+  const handleSignOut = () => {
+    setIsAuthenticated(false);
+    toast({
+      title: "ログアウト",
+      description: "ログアウトしました",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 safe-area-inset">
@@ -116,10 +132,10 @@ const DashboardView = ({ userType }: { userType: 'parent' | 'child' }) => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold text-gray-800">
-                Oyako Nikki
+                親子日記
               </h1>
               <p className="text-sm text-gray-500">
-                {userType === 'parent' ? 'Parent View' : 'Child View'}
+                {userType === 'parent' ? '保護者モード' : 'お子様モード'}
               </p>
             </div>
             <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center">
@@ -134,7 +150,7 @@ const DashboardView = ({ userType }: { userType: 'parent' | 'child' }) => {
         {activeTab === 'home' && <HomeTab userType={userType} />}
         {activeTab === 'write' && <WriteTab userType={userType} />}
         {activeTab === 'calendar' && <CalendarTab />}
-        {activeTab === 'profile' && <ProfileTab userType={userType} />}
+        {activeTab === 'profile' && <ProfileTab userType={userType} onSignOut={handleSignOut} />}
       </main>
 
       {/* Mobile-optimized Bottom Navigation */}
@@ -142,10 +158,10 @@ const DashboardView = ({ userType }: { userType: 'parent' | 'child' }) => {
         <div className="px-4 py-2">
           <div className="flex justify-around">
             {[
-              { id: 'home', icon: Heart, label: 'Home' },
-              { id: 'write', icon: BookOpen, label: 'Write' },
-              { id: 'calendar', icon: Calendar, label: 'Calendar' },
-              { id: 'profile', icon: Users, label: 'Profile' }
+              { id: 'home', icon: Heart, label: 'ホーム' },
+              { id: 'write', icon: BookOpen, label: '日記を書く' },
+              { id: 'calendar', icon: Calendar, label: 'カレンダー' },
+              { id: 'profile', icon: Users, label: 'プロフィール' }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -171,18 +187,18 @@ const HomeTab = ({ userType }: { userType: 'parent' | 'child' }) => {
   const sampleEntries = [
     {
       id: 1,
-      date: '2025-01-20',
-      author: userType === 'parent' ? 'Yuki' : 'Mom',
+      date: '2025年1月20日',
+      author: userType === 'parent' ? 'ゆき' : 'ママ',
       mood: '😊',
-      excerpt: 'Today was a wonderful day at school...',
+      excerpt: '今日は学校でとても楽しい一日でした...',
       isOwn: userType === 'child'
     },
     {
       id: 2,
-      date: '2025-01-19',
-      author: userType === 'parent' ? 'Yuki' : 'Dad',
+      date: '2025年1月19日',
+      author: userType === 'parent' ? 'ゆき' : 'パパ',
       mood: '😴',
-      excerpt: 'I felt a bit tired today but...',
+      excerpt: '今日は少し疲れましたが...',
       isOwn: userType === 'child'
     }
   ];
@@ -191,12 +207,12 @@ const HomeTab = ({ userType }: { userType: 'parent' | 'child' }) => {
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-3">
-          {userType === 'parent' ? "Your child's stories" : "Your family diary"}
+          {userType === 'parent' ? "お子様の物語" : "家族の日記"}
         </h2>
         <p className="text-gray-600">
           {userType === 'parent' 
-            ? "See how your child is feeling each day" 
-            : "Share your daily adventures"}
+            ? "お子様の毎日の気持ちを見ることができます" 
+            : "毎日の冒険を家族と共有しましょう"}
         </p>
       </div>
 
@@ -214,7 +230,7 @@ const HomeTab = ({ userType }: { userType: 'parent' | 'child' }) => {
                 </div>
                 {entry.isOwn && (
                   <span className="bg-purple-100 text-purple-700 text-xs px-3 py-1 rounded-full font-medium">
-                    You
+                    あなた
                   </span>
                 )}
               </div>
@@ -230,26 +246,38 @@ const HomeTab = ({ userType }: { userType: 'parent' | 'child' }) => {
 const WriteTab = ({ userType }: { userType: 'parent' | 'child' }) => {
   const [mood, setMood] = useState('');
   const [entry, setEntry] = useState('');
+  const { toast } = useToast();
 
   const moods = [
-    { emoji: '😊', label: 'Happy' },
-    { emoji: '😢', label: 'Sad' },
-    { emoji: '😴', label: 'Tired' },
-    { emoji: '😠', label: 'Angry' },
-    { emoji: '😲', label: 'Surprised' },
-    { emoji: '🤔', label: 'Thoughtful' }
+    { emoji: '😊', label: '嬉しい' },
+    { emoji: '😢', label: '悲しい' },
+    { emoji: '😴', label: '疲れた' },
+    { emoji: '😠', label: '怒り' },
+    { emoji: '😲', label: 'びっくり' },
+    { emoji: '🤔', label: '考え中' }
   ];
+
+  const handleSave = () => {
+    if (mood && entry.trim()) {
+      toast({
+        title: "日記を保存しました",
+        description: "今日の日記が保存されました",
+      });
+      setMood('');
+      setEntry('');
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-3">
-          How are you feeling today?
+          今日の気分はどうですか？
         </h2>
         <p className="text-gray-600">
           {userType === 'child' 
-            ? "Share your day with your family" 
-            : "Write about your day"}
+            ? "今日の出来事を家族と共有しましょう" 
+            : "今日のことを書いてみましょう"}
         </p>
       </div>
 
@@ -257,7 +285,7 @@ const WriteTab = ({ userType }: { userType: 'parent' | 'child' }) => {
         <CardContent className="p-6 space-y-6">
           <div>
             <Label className="text-lg font-semibold text-gray-700 mb-4 block">
-              Pick your mood
+              気分を選んでください
             </Label>
             <div className="grid grid-cols-3 gap-4">
               {moods.map((moodOption) => (
@@ -279,15 +307,15 @@ const WriteTab = ({ userType }: { userType: 'parent' | 'child' }) => {
 
           <div>
             <Label htmlFor="diary-entry" className="text-lg font-semibold text-gray-700 mb-3 block">
-              Write about your day
+              今日のことを書いてください
             </Label>
             <textarea
               id="diary-entry"
               value={entry}
               onChange={(e) => setEntry(e.target.value)}
               placeholder={userType === 'child' 
-                ? "What happened today? How did you feel?"
-                : "Share your thoughts about today..."
+                ? "今日は何がありましたか？どんな気持ちでしたか？"
+                : "今日の出来事について書いてください..."
               }
               className="w-full p-4 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base leading-relaxed"
               rows={8}
@@ -297,8 +325,9 @@ const WriteTab = ({ userType }: { userType: 'parent' | 'child' }) => {
           <Button 
             className="w-full h-14 text-lg font-semibold" 
             disabled={!mood || !entry.trim()}
+            onClick={handleSave}
           >
-            Save Today's Entry
+            今日の日記を保存
           </Button>
         </CardContent>
       </Card>
@@ -311,10 +340,10 @@ const CalendarTab = () => {
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-3">
-          Your Diary Calendar
+          日記カレンダー
         </h2>
         <p className="text-gray-600">
-          Look back at your family's memories
+          家族の思い出を振り返ってみましょう
         </p>
       </div>
 
@@ -322,9 +351,9 @@ const CalendarTab = () => {
         <CardContent className="p-8">
           <div className="text-center py-12">
             <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-6" />
-            <p className="text-lg text-gray-500 mb-2">Calendar view coming soon!</p>
+            <p className="text-lg text-gray-500 mb-2">カレンダー機能は開発中です！</p>
             <p className="text-sm text-gray-400">
-              You'll be able to browse all your diary entries by date
+              日付別に日記を見ることができるようになります
             </p>
           </div>
         </CardContent>
@@ -333,12 +362,42 @@ const CalendarTab = () => {
   );
 };
 
-const ProfileTab = ({ userType }: { userType: 'parent' | 'child' }) => {
+const ProfileTab = ({ userType, onSignOut }: { userType: 'parent' | 'child', onSignOut: () => void }) => {
+  const { toast } = useToast();
+
+  const handlePrivacySettings = () => {
+    toast({
+      title: "プライバシー設定",
+      description: "プライバシー設定画面を開きます",
+    });
+  };
+
+  const handleNotificationSettings = () => {
+    toast({
+      title: "通知設定",
+      description: "通知設定画面を開きます",
+    });
+  };
+
+  const handleAddChild = () => {
+    toast({
+      title: "お子様を追加",
+      description: "新しいお子様を追加する画面を開きます",
+    });
+  };
+
+  const handleManageChild = () => {
+    toast({
+      title: "お子様の管理",
+      description: "お子様の設定を管理します",
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-3">
-          Profile Settings
+          プロフィール設定
         </h2>
       </div>
 
@@ -350,7 +409,7 @@ const ProfileTab = ({ userType }: { userType: 'parent' | 'child' }) => {
             </div>
             <div>
               <p className="font-semibold text-gray-800 text-lg">
-                {userType === 'parent' ? 'Parent Account' : 'Child Account'}
+                {userType === 'parent' ? '保護者アカウント' : 'お子様アカウント'}
               </p>
               <p className="text-sm text-gray-500">user@example.com</p>
             </div>
@@ -358,33 +417,37 @@ const ProfileTab = ({ userType }: { userType: 'parent' | 'child' }) => {
 
           {userType === 'parent' && (
             <div className="pt-4 border-t">
-              <h3 className="font-semibold text-gray-800 mb-4 text-lg">Family Connections</h3>
+              <h3 className="font-semibold text-gray-800 mb-4 text-lg">家族の接続</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                   <div>
-                    <p className="font-semibold">Yuki</p>
-                    <p className="text-sm text-gray-500">Connected child</p>
+                    <p className="font-semibold">ゆき</p>
+                    <p className="text-sm text-gray-500">接続されたお子様</p>
                   </div>
-                  <Button variant="outline" size="sm" className="h-10">
-                    Manage
+                  <Button variant="outline" size="sm" className="h-10" onClick={handleManageChild}>
+                    管理
                   </Button>
                 </div>
-                <Button variant="outline" className="w-full h-12">
-                  Add Another Child
+                <Button variant="outline" className="w-full h-12" onClick={handleAddChild}>
+                  <UserPlus className="w-5 h-5 mr-2" />
+                  お子様を追加
                 </Button>
               </div>
             </div>
           )}
 
           <div className="pt-4 border-t space-y-3">
-            <Button variant="outline" className="w-full justify-start h-12 text-base">
-              Privacy Settings
+            <Button variant="outline" className="w-full justify-start h-12 text-base" onClick={handlePrivacySettings}>
+              <Shield className="w-5 h-5 mr-3" />
+              プライバシー設定
             </Button>
-            <Button variant="outline" className="w-full justify-start h-12 text-base">
-              Notification Settings
+            <Button variant="outline" className="w-full justify-start h-12 text-base" onClick={handleNotificationSettings}>
+              <Bell className="w-5 h-5 mr-3" />
+              通知設定
             </Button>
-            <Button variant="outline" className="w-full justify-start h-12 text-base text-red-600 hover:text-red-700">
-              Sign Out
+            <Button variant="outline" className="w-full justify-start h-12 text-base text-red-600 hover:text-red-700" onClick={onSignOut}>
+              <LogOut className="w-5 h-5 mr-3" />
+              ログアウト
             </Button>
           </div>
         </CardContent>
