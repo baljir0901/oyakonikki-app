@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 
 interface EmailAuthFormProps {
@@ -13,11 +14,23 @@ interface EmailAuthFormProps {
 export const EmailAuthForm = ({ isLogin, onEmailAuth }: EmailAuthFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [paymentApproved, setPaymentApproved] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check payment approval for registration
+    if (!isLogin && !paymentApproved) {
+      toast({
+        title: "支払い承認が必要",
+        description: "月額料金の支払いに同意してください",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -83,6 +96,33 @@ export const EmailAuthForm = ({ isLogin, onEmailAuth }: EmailAuthFormProps) => {
           required
         />
       </div>
+
+      {!isLogin && (
+        <div className="space-y-3">
+          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="payment-approval"
+                checked={paymentApproved}
+                onCheckedChange={(checked) => setPaymentApproved(checked as boolean)}
+                className="mt-0.5"
+              />
+              <div className="flex-1">
+                <Label 
+                  htmlFor="payment-approval" 
+                  className="text-sm font-medium cursor-pointer"
+                >
+                  月額料金の支払いに同意する
+                </Label>
+                <p className="text-sm text-gray-600 mt-1">
+                  このアプリの月額料金は<span className="font-semibold text-blue-600">300円</span>です。
+                  登録することで、毎月の支払いに同意したことになります。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       
       <Button 
         type="submit" 
