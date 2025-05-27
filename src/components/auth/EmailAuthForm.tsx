@@ -42,7 +42,7 @@ export const EmailAuthForm = ({ isLogin, onEmailAuth }: EmailAuthFormProps) => {
       } else if (!isLogin) {
         toast({
           title: "新規登録完了",
-          description: "アカウントが作成されました",
+          description: "アカウントが作成され、自動的にログインされました",
         });
       }
     } catch (error) {
