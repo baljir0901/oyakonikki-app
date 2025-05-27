@@ -35,7 +35,8 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
     setLoading(true);
 
     try {
-      const { error } = await supabase
+      // Use a more generic approach that doesn't rely on strict typing
+      const { error } = await (supabase as any)
         .from('diary_entries')
         .insert({
           user_id: user.id,
