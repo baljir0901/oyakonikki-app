@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface WriteTabProps {
   userType: 'parent' | 'child';
@@ -12,7 +14,9 @@ interface WriteTabProps {
 export const WriteTab = ({ userType }: WriteTabProps) => {
   const [mood, setMood] = useState('');
   const [entry, setEntry] = useState('');
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const moods = [
     { emoji: '😊', label: '嬉しい' },
@@ -23,14 +27,46 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
     { emoji: '🤔', label: '考え中' }
   ];
 
-  const handleSave = () => {
-    if (mood && entry.trim()) {
+  const handleSave = async () => {
+    if (!mood || !entry.trim() || !user) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('diary_entries')
+        .insert({
+          user_id: user.id,
+          mood: mood,
+          content: entry.trim()
+        });
+
+      if (error) {
+        console.error('Error saving diary entry:', error);
+        toast({
+          title: "エラー",
+          description: "日記の保存に失敗しました",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "日記を保存しました",
+          description: "今日の日記が保存されました",
+        });
+        setMood('');
+        setEntry('');
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
       toast({
-        title: "日記を保存しました",
-        description: "今日の日記が保存されました",
+        title: "エラー",
+        description: "予期しないエラーが発生しました",
+        variant: "destructive",
       });
-      setMood('');
-      setEntry('');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,10 +126,10 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
 
           <Button 
             className="w-full h-14 text-lg font-semibold" 
-            disabled={!mood || !entry.trim()}
+            disabled={!mood || !entry.trim() || loading}
             onClick={handleSave}
           >
-            今日の日記を保存
+            {loading ? "保存中..." : "今日の日記を保存"}
           </Button>
         </CardContent>
       </Card>
