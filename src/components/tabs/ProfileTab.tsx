@@ -1,8 +1,11 @@
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Shield, Bell, LogOut, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { PrivacySettings } from "../settings/PrivacySettings";
+import { NotificationSettings } from "../settings/NotificationSettings";
 
 interface ProfileTabProps {
   userType: 'parent' | 'child';
@@ -10,21 +13,8 @@ interface ProfileTabProps {
 }
 
 export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
+  const [currentView, setCurrentView] = useState<'main' | 'privacy' | 'notifications'>('main');
   const { toast } = useToast();
-
-  const handlePrivacySettings = () => {
-    toast({
-      title: "プライバシー設定",
-      description: "プライバシー設定画面を開きます",
-    });
-  };
-
-  const handleNotificationSettings = () => {
-    toast({
-      title: "通知設定",
-      description: "通知設定画面を開きます",
-    });
-  };
 
   const handleAddChild = () => {
     toast({
@@ -39,6 +29,14 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
       description: "お子様の設定を管理します",
     });
   };
+
+  if (currentView === 'privacy') {
+    return <PrivacySettings onBack={() => setCurrentView('main')} />;
+  }
+
+  if (currentView === 'notifications') {
+    return <NotificationSettings onBack={() => setCurrentView('main')} />;
+  }
 
   return (
     <div className="space-y-6">
@@ -84,11 +82,19 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
           )}
 
           <div className="pt-4 border-t space-y-3">
-            <Button variant="outline" className="w-full justify-start h-12 text-base" onClick={handlePrivacySettings}>
+            <Button 
+              variant="outline" 
+              className="w-full justify-start h-12 text-base" 
+              onClick={() => setCurrentView('privacy')}
+            >
               <Shield className="w-5 h-5 mr-3" />
               プライバシー設定
             </Button>
-            <Button variant="outline" className="w-full justify-start h-12 text-base" onClick={handleNotificationSettings}>
+            <Button 
+              variant="outline" 
+              className="w-full justify-start h-12 text-base" 
+              onClick={() => setCurrentView('notifications')}
+            >
               <Bell className="w-5 h-5 mr-3" />
               通知設定
             </Button>
