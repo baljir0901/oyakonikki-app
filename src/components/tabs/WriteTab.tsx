@@ -18,6 +18,8 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
 
+  console.log('WriteTab render - mood:', mood, 'entry length:', entry.length, 'user:', !!user, 'loading:', loading);
+
   const moods = [
     { emoji: '😊', label: '嬉しい' },
     { emoji: '😢', label: '悲しい' },
@@ -28,14 +30,18 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
   ];
 
   const handleSave = async () => {
+    console.log('handleSave called - mood:', mood, 'entry:', entry.trim(), 'user:', !!user);
+    
     if (!mood || !entry.trim() || !user) {
+      console.log('Missing required data:', { mood: !!mood, entry: !!entry.trim(), user: !!user });
       return;
     }
 
     setLoading(true);
 
     try {
-      // Use a more generic approach that doesn't rely on strict typing
+      console.log('Attempting to save diary entry...');
+      
       const { error } = await (supabase as any)
         .from('diary_entries')
         .insert({
@@ -52,6 +58,7 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
           variant: "destructive",
         });
       } else {
+        console.log('Diary entry saved successfully');
         toast({
           title: "日記を保存しました",
           description: "今日の日記が保存されました",
@@ -70,6 +77,9 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
       setLoading(false);
     }
   };
+
+  const isButtonDisabled = !mood || !entry.trim() || loading || !user;
+  console.log('Button disabled state:', isButtonDisabled, { mood: !!mood, entry: !!entry.trim(), loading, user: !!user });
 
   return (
     <div className="space-y-6">
@@ -94,7 +104,10 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
               {moods.map((moodOption) => (
                 <button
                   key={moodOption.emoji}
-                  onClick={() => setMood(moodOption.emoji)}
+                  onClick={() => {
+                    console.log('Mood selected:', moodOption.emoji);
+                    setMood(moodOption.emoji);
+                  }}
                   className={`flex flex-col items-center p-4 rounded-xl border-2 transition-all duration-200 active:scale-95 ${
                     mood === moodOption.emoji
                       ? 'border-purple-400 bg-purple-50 shadow-md'
@@ -115,7 +128,10 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
             <textarea
               id="diary-entry"
               value={entry}
-              onChange={(e) => setEntry(e.target.value)}
+              onChange={(e) => {
+                console.log('Entry changed, length:', e.target.value.length);
+                setEntry(e.target.value);
+              }}
               placeholder={userType === 'child' 
                 ? "今日は何がありましたか？どんな気持ちでしたか？"
                 : "今日の出来事について書いてください..."
@@ -127,11 +143,16 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
 
           <Button 
             className="w-full h-14 text-lg font-semibold" 
-            disabled={!mood || !entry.trim() || loading}
+            disabled={isButtonDisabled}
             onClick={handleSave}
           >
             {loading ? "保存中..." : "今日の日記を保存"}
           </Button>
+          
+          {/* Debug info */}
+          <div className="text-xs text-gray-500 mt-2">
+            Debug: Mood: {mood || 'none'}, Entry: {entry.length} chars, User: {user ? 'logged in' : 'not logged in'}
+          </div>
         </CardContent>
       </Card>
     </div>
