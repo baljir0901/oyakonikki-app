@@ -84,86 +84,82 @@ export const CalendarTab = () => {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Calendar Section */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex justify-center">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={handleDateSelect}
-                locale={ja}
-                className="rounded-md border pointer-events-auto"
-                modifiers={{
-                  hasEntry: (date) => hasEntry(date)
-                }}
-                modifiersStyles={{
-                  hasEntry: {
-                    backgroundColor: '#e879f9',
-                    color: 'white',
-                    fontWeight: 'bold'
-                  }
-                }}
-              />
+      {/* Monthly Calendar - Top Section */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex justify-center">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={handleDateSelect}
+              locale={ja}
+              className="rounded-md border pointer-events-auto"
+              modifiers={{
+                hasEntry: (date) => hasEntry(date)
+              }}
+              modifiersStyles={{
+                hasEntry: {
+                  backgroundColor: '#e879f9',
+                  color: 'white',
+                  fontWeight: 'bold'
+                }
+              }}
+            />
+          </div>
+          <div className="mt-4 text-center">
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+              <div className="w-3 h-3 bg-purple-400 rounded-full"></div>
+              <span>日記がある日</span>
             </div>
-            <div className="mt-4 text-center">
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                <div className="w-3 h-3 bg-purple-400 rounded-full"></div>
-                <span>日記がある日</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Selected Date Entry */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="min-h-[300px]">
-              {loading ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-gray-500">読み込み中...</div>
-                </div>
-              ) : date ? (
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                    {format(date, 'yyyy年MM月dd日(EEEE)', { locale: ja })}
-                  </h3>
+      {/* Selected Date Entry - Bottom Section */}
+      <Card>
+        <CardContent className="p-6">
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-gray-500">読み込み中...</div>
+            </div>
+          ) : date ? (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                {format(date, 'yyyy年MM月dd日(EEEE)', { locale: ja })}
+              </h3>
+              
+              {selectedEntry ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{selectedEntry.mood}</span>
+                    <Badge variant="secondary">
+                      {format(new Date(selectedEntry.created_at), 'HH:mm')}
+                    </Badge>
+                  </div>
                   
-                  {selectedEntry ? (
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl">{selectedEntry.mood}</span>
-                        <Badge variant="secondary">
-                          {format(new Date(selectedEntry.created_at), 'HH:mm')}
-                        </Badge>
-                      </div>
-                      
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-                          {selectedEntry.content}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <div className="text-gray-400 mb-2">📝</div>
-                      <p className="text-gray-500">この日の日記はありません</p>
-                      <p className="text-sm text-gray-400 mt-1">
-                        日記を書いて思い出を残しましょう
-                      </p>
-                    </div>
-                  )}
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                      {selectedEntry.content}
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-gray-500">日付を選択してください</p>
+                  <div className="text-gray-400 mb-2">📝</div>
+                  <p className="text-gray-500">この日の日記はありません</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    日記を書いて思い出を残しましょう
+                  </p>
                 </div>
               )}
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">日付を選択してください</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Recent Entries Summary */}
       {diaryEntries.length > 0 && (

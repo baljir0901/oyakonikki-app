@@ -36,6 +36,72 @@ export type Database = {
         }
         Relationships: []
       }
+      family_invitations: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          invitation_code: string
+          invitee_email: string
+          inviter_id: string
+          inviter_role: string
+          relationship_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invitation_code?: string
+          invitee_email: string
+          inviter_id: string
+          inviter_role: string
+          relationship_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invitation_code?: string
+          invitee_email?: string
+          inviter_id?: string
+          inviter_role?: string
+          relationship_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      family_relationships: {
+        Row: {
+          child_id: string
+          created_at: string
+          id: string
+          parent_id: string
+          relationship_type: string
+          updated_at: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          id?: string
+          parent_id: string
+          relationship_type?: string
+          updated_at?: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          id?: string
+          parent_id?: string
+          relationship_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
