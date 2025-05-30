@@ -12,28 +12,18 @@ interface WriteTabProps {
 }
 
 export const WriteTab = ({ userType }: WriteTabProps) => {
-  const [mood, setMood] = useState('');
   const [entry, setEntry] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
-  console.log('WriteTab render - mood:', mood, 'entry length:', entry.length, 'user:', !!user, 'loading:', loading);
-
-  const moods = [
-    { emoji: '😊', label: '嬉しい' },
-    { emoji: '😢', label: '悲しい' },
-    { emoji: '😴', label: '疲れた' },
-    { emoji: '😠', label: '怒り' },
-    { emoji: '😲', label: 'びっくり' },
-    { emoji: '🤔', label: '考え中' }
-  ];
+  console.log('WriteTab render - entry length:', entry.length, 'user:', !!user, 'loading:', loading);
 
   const handleSave = async () => {
-    console.log('handleSave called - mood:', mood, 'entry:', entry.trim(), 'user:', !!user);
+    console.log('handleSave called - entry:', entry.trim(), 'user:', !!user);
     
-    if (!mood || !entry.trim() || !user) {
-      console.log('Missing required data:', { mood: !!mood, entry: !!entry.trim(), user: !!user });
+    if (!entry.trim() || !user) {
+      console.log('Missing required data:', { entry: !!entry.trim(), user: !!user });
       return;
     }
 
@@ -42,11 +32,11 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
     try {
       console.log('Attempting to save diary entry...');
       
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('diary_entries')
         .insert({
           user_id: user.id,
-          mood: mood,
+          mood: '📝', // Default mood emoji for diary entries
           content: entry.trim()
         });
 
@@ -63,7 +53,6 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
           title: "日記を保存しました",
           description: "今日の日記が保存されました",
         });
-        setMood('');
         setEntry('');
       }
     } catch (error) {
@@ -78,14 +67,14 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
     }
   };
 
-  const isButtonDisabled = !mood || !entry.trim() || loading || !user;
-  console.log('Button disabled state:', isButtonDisabled, { mood: !!mood, entry: !!entry.trim(), loading, user: !!user });
+  const isButtonDisabled = !entry.trim() || loading || !user;
+  console.log('Button disabled state:', isButtonDisabled, { entry: !!entry.trim(), loading, user: !!user });
 
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-3">
-          今日の気分はどうですか？
+          今日の日記を書きましょう
         </h2>
         <p className="text-gray-600">
           {userType === 'child' 
@@ -96,31 +85,6 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
 
       <Card>
         <CardContent className="p-6 space-y-6">
-          <div>
-            <Label className="text-lg font-semibold text-gray-700 mb-4 block">
-              気分を選んでください
-            </Label>
-            <div className="grid grid-cols-3 gap-4">
-              {moods.map((moodOption) => (
-                <button
-                  key={moodOption.emoji}
-                  onClick={() => {
-                    console.log('Mood selected:', moodOption.emoji);
-                    setMood(moodOption.emoji);
-                  }}
-                  className={`flex flex-col items-center p-4 rounded-xl border-2 transition-all duration-200 active:scale-95 ${
-                    mood === moodOption.emoji
-                      ? 'border-purple-400 bg-purple-50 shadow-md'
-                      : 'border-gray-200 hover:border-gray-300 active:bg-gray-50'
-                  }`}
-                >
-                  <span className="text-3xl mb-2">{moodOption.emoji}</span>
-                  <span className="text-sm text-gray-600 font-medium">{moodOption.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div>
             <Label htmlFor="diary-entry" className="text-lg font-semibold text-gray-700 mb-3 block">
               今日のことを書いてください
@@ -137,7 +101,7 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
                 : "今日の出来事について書いてください..."
               }
               className="w-full p-4 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base leading-relaxed"
-              rows={8}
+              rows={12}
             />
           </div>
 
@@ -151,7 +115,7 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
           
           {/* Debug info */}
           <div className="text-xs text-gray-500 mt-2">
-            Debug: Mood: {mood || 'none'}, Entry: {entry.length} chars, User: {user ? 'logged in' : 'not logged in'}
+            Debug: Entry: {entry.length} chars, User: {user ? 'logged in' : 'not logged in'}
           </div>
         </CardContent>
       </Card>
