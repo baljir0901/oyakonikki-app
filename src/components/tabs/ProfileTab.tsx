@@ -9,6 +9,7 @@ import { NotificationSettings } from "../settings/NotificationSettings";
 import { AddChildDialog } from "../family/AddChildDialog";
 import { AddParentDialog } from "../family/AddParentDialog";
 import { FamilyInvitations } from "../family/FamilyInvitations";
+import { ChildManagementDialog } from "../family/ChildManagementDialog";
 
 interface ProfileTabProps {
   userType: 'parent' | 'child';
@@ -19,6 +20,8 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
   const [currentView, setCurrentView] = useState<'main' | 'privacy' | 'notifications'>('main');
   const [showAddChildDialog, setShowAddChildDialog] = useState(false);
   const [showAddParentDialog, setShowAddParentDialog] = useState(false);
+  const [showChildManagement, setShowChildManagement] = useState(false);
+  const [selectedChildName, setSelectedChildName] = useState('');
   const { toast } = useToast();
 
   const handleAddChild = () => {
@@ -29,11 +32,9 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
     setShowAddParentDialog(true);
   };
 
-  const handleManageChild = () => {
-    toast({
-      title: "お子様の管理",
-      description: "お子様の設定を管理します",
-    });
+  const handleManageChild = (childName: string) => {
+    setSelectedChildName(childName);
+    setShowChildManagement(true);
   };
 
   const handleInvitationSuccess = () => {
@@ -82,7 +83,12 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
                       <p className="font-semibold">ゆき</p>
                       <p className="text-sm text-gray-500">接続されたお子様</p>
                     </div>
-                    <Button variant="outline" size="sm" className="h-10" onClick={handleManageChild}>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-10" 
+                      onClick={() => handleManageChild('ゆき')}
+                    >
                       管理
                     </Button>
                   </div>
@@ -137,6 +143,12 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
         open={showAddParentDialog}
         onOpenChange={setShowAddParentDialog}
         onSuccess={handleInvitationSuccess}
+      />
+
+      <ChildManagementDialog
+        open={showChildManagement}
+        onOpenChange={setShowChildManagement}
+        childName={selectedChildName}
       />
     </div>
   );
