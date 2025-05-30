@@ -52,7 +52,7 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">
+        <h2 className="text-2xl font-bold text-gray-700 mb-3">
           プロフィール設定
         </h2>
       </div>
@@ -66,7 +66,7 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
               <Heart className="w-10 h-10 text-white" />
             </div>
             <div>
-              <p className="font-semibold text-gray-800 text-lg">
+              <p className="font-semibold text-gray-700 text-lg">
                 {userType === 'parent' ? '保護者アカウント' : 'お子様アカウント'}
               </p>
               <p className="text-sm text-gray-500">user@example.com</p>
@@ -74,25 +74,25 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
           </div>
 
           <div className="pt-4 border-t">
-            <h3 className="font-semibold text-gray-800 mb-4 text-lg">家族の接続</h3>
+            <h3 className="font-semibold text-gray-700 mb-4 text-lg">家族の接続</h3>
             <div className="space-y-3">
               {userType === 'parent' && (
                 <>
                   <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                     <div>
-                      <p className="font-semibold">ゆき</p>
+                      <p className="font-semibold text-gray-700">ゆき</p>
                       <p className="text-sm text-gray-500">接続されたお子様</p>
                     </div>
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="h-10" 
+                      className="h-10 text-gray-600" 
                       onClick={() => handleManageChild('ゆき')}
                     >
                       管理
                     </Button>
                   </div>
-                  <Button variant="outline" className="w-full h-12" onClick={handleAddChild}>
+                  <Button variant="outline" className="w-full h-12 text-gray-600" onClick={handleAddChild}>
                     <UserPlus className="w-5 h-5 mr-2" />
                     お子様を追加
                   </Button>
@@ -100,7 +100,7 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
               )}
               
               {userType === 'child' && (
-                <Button variant="outline" className="w-full h-12" onClick={handleAddParent}>
+                <Button variant="outline" className="w-full h-12 text-gray-600" onClick={handleAddParent}>
                   <Users className="w-5 h-5 mr-2" />
                   保護者を追加
                 </Button>
@@ -111,7 +111,7 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
           <div className="pt-4 border-t space-y-3">
             <Button 
               variant="outline" 
-              className="w-full justify-start h-12 text-base" 
+              className="w-full justify-start h-12 text-base text-gray-600" 
               onClick={() => setCurrentView('privacy')}
             >
               <Shield className="w-5 h-5 mr-3" />
@@ -119,7 +119,7 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
             </Button>
             <Button 
               variant="outline" 
-              className="w-full justify-start h-12 text-base" 
+              className="w-full justify-start h-12 text-base text-gray-600" 
               onClick={() => setCurrentView('notifications')}
             >
               <Bell className="w-5 h-5 mr-3" />
