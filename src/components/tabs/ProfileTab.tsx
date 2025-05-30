@@ -2,10 +2,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, Shield, Bell, LogOut, UserPlus, Users } from "lucide-react";
+import { Heart, Shield, Bell, LogOut, UserPlus, Users, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PrivacySettings } from "../settings/PrivacySettings";
 import { NotificationSettings } from "../settings/NotificationSettings";
+import { PaymentSettings } from "../settings/PaymentSettings";
 import { AddChildDialog } from "../family/AddChildDialog";
 import { AddParentDialog } from "../family/AddParentDialog";
 import { FamilyInvitations } from "../family/FamilyInvitations";
@@ -17,7 +18,7 @@ interface ProfileTabProps {
 }
 
 export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
-  const [currentView, setCurrentView] = useState<'main' | 'privacy' | 'notifications'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'privacy' | 'notifications' | 'payment'>('main');
   const [showAddChildDialog, setShowAddChildDialog] = useState(false);
   const [showAddParentDialog, setShowAddParentDialog] = useState(false);
   const [showChildManagement, setShowChildManagement] = useState(false);
@@ -47,6 +48,10 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
 
   if (currentView === 'notifications') {
     return <NotificationSettings onBack={() => setCurrentView('main')} />;
+  }
+
+  if (currentView === 'payment') {
+    return <PaymentSettings onBack={() => setCurrentView('main')} />;
   }
 
   return (
@@ -109,6 +114,14 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
           </div>
 
           <div className="pt-4 border-t space-y-3">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start h-12 text-base text-gray-600" 
+              onClick={() => setCurrentView('payment')}
+            >
+              <CreditCard className="w-5 h-5 mr-3" />
+              支払い設定
+            </Button>
             <Button 
               variant="outline" 
               className="w-full justify-start h-12 text-base text-gray-600" 
