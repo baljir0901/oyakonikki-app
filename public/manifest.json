@@ -1,0 +1,29 @@
+
+{
+  "name": "親子日記ブリッジ",
+  "short_name": "親子日記",
+  "description": "親子をつなぐ日記アプリ",
+  "theme_color": "#ec4899",
+  "background_color": "#fdf2f8",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
