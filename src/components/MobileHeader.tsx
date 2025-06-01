@@ -18,9 +18,9 @@ export const MobileHeader = ({ userType }: MobileHeaderProps) => {
               {userType === 'parent' ? '保護者モード' : 'お子様モード'}
             </p>
           </div>
-          <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center">
+          {/* <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center">
             <Heart className="w-5 h-5 text-white" />
-          </div>
+          </div> */}
         </div>
       </div>
     </header>
