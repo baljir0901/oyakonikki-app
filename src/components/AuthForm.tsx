@@ -30,6 +30,9 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center p-4 safe-area-inset font-japanese">
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center pb-4">
+          <CardTitle className="text-3xl font-bold text-gray-800 mb-2">
+            親子日記
+          </CardTitle>
           <p className="text-sm text-gray-500 mt-2">
             毎日の物語で心をつなぐ
           </p>
