@@ -194,7 +194,7 @@ export const PaymentSettings = ({ onBack }: PaymentSettingsProps) => {
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="font-semibold">プレミアムプラン</h3>
-                  <p className="text-sm text-gray-500">月額 ¥799</p>
+                  <p className="text-sm text-gray-500">月額 ¥300</p>
                   <p className="text-xs text-gray-400 mt-1">
                     • 無制限の日記作成<br/>
                     • 高度な分析機能<br/>
