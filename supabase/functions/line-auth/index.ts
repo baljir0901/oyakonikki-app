@@ -1,3 +1,4 @@
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
@@ -90,14 +91,31 @@ Deno.serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Create a unique email for LINE users
+    // Create a unique email for LINE users and generate a proper UUID
     const lineEmail = `line_${profileData.userId}@line.local`
+    
+    // Generate a deterministic UUID from the LINE user ID
+    const encoder = new TextEncoder()
+    const data = encoder.encode(`line_${profileData.userId}`)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+    const hashArray = new Uint8Array(hashBuffer)
+    
+    // Create UUID v4 format from hash
+    const uuid = Array.from(hashArray.slice(0, 16))
+      .map((b, i) => {
+        if (i === 6) return ((b & 0x0f) | 0x40).toString(16).padStart(2, '0') // version 4
+        if (i === 8) return ((b & 0x3f) | 0x80).toString(16).padStart(2, '0') // variant bits
+        return b.toString(16).padStart(2, '0')
+      })
+      .join('')
+    
+    const properUuid = `${uuid.slice(0, 8)}-${uuid.slice(8, 12)}-${uuid.slice(12, 16)}-${uuid.slice(16, 20)}-${uuid.slice(20, 32)}`
 
     // Check if user already exists
     const { data: existingUser } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', profileData.userId)
+      .eq('id', properUuid)
       .single()
 
     let user
@@ -105,12 +123,12 @@ Deno.serve(async (req) => {
       console.log('Existing LINE user found')
       user = existingUser
     } else {
-      console.log('Creating new LINE user')
+      console.log('Creating new LINE user with UUID:', properUuid)
       // Create new user profile
       const { data: newUser, error: userError } = await supabase
         .from('profiles')
         .insert({
-          id: profileData.userId,
+          id: properUuid,
           email: lineEmail,
           full_name: profileData.displayName,
           avatar_url: profileData.pictureUrl || null,
@@ -128,7 +146,8 @@ Deno.serve(async (req) => {
 
     // Generate a session token (you might want to use a proper JWT library)
     const sessionToken = btoa(JSON.stringify({
-      userId: profileData.userId,
+      userId: properUuid,
+      lineUserId: profileData.userId,
       email: lineEmail,
       name: profileData.displayName,
       avatar: profileData.pictureUrl,
@@ -140,7 +159,8 @@ Deno.serve(async (req) => {
       JSON.stringify({
         success: true,
         user: {
-          id: profileData.userId,
+          id: properUuid,
+          lineUserId: profileData.userId,
           email: lineEmail,
           name: profileData.displayName,
           avatar: profileData.pictureUrl,
