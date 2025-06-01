@@ -112,11 +112,6 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
           >
             {loading ? "保存中..." : "今日の日記を保存"}
           </Button>
-          
-          {/* Debug info */}
-          <div className="text-xs text-gray-500 mt-2">
-            Debug: Entry: {entry.length} chars, User: {user ? 'logged in' : 'not logged in'}
-          </div>
         </CardContent>
       </Card>
     </div>
