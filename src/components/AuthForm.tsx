@@ -6,7 +6,7 @@ import { BookOpen, Users } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { EmailAuthForm } from "./auth/EmailAuthForm";
 import { SocialAuthButtons } from "./auth/SocialAuthButtons";
-import { toast } from "sonner"; // Алдааны мессеж харуулахад зориулж sonner нэмсэн
+import { toast } from "sonner"; // Алдаа ба амжилтын мессеж харуулах
 
 interface AuthFormProps {
   setUserType: (type: "parent" | "child") => void;
@@ -17,7 +17,7 @@ export const AuthForm = ({ setUserType, userType }: AuthFormProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const { signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
 
-  // Алдаа боловсруулалт нэмсэн handleEmailAuth
+  // Алдаа боловсруулалттай handleEmailAuth
   const handleEmailAuth = async (
     email: string,
     password: string,
@@ -26,33 +26,40 @@ export const AuthForm = ({ setUserType, userType }: AuthFormProps) => {
     try {
       if (isLogin) {
         const result = await signInWithEmail(email, password);
-        toast.success("ログインに成功しました！"); // Амжилттай нэвтрэлтийн мессеж
+        toast.success("ログインに成功しました！", { duration: 3000 });
         return result;
       } else {
         const result = await signUpWithEmail(email, password);
-        toast.success("アカウント登録に成功しました！"); // Амжилттай бүртгэлийн мессеж
+        toast.success("アカウント登録に成功しました！", { duration: 3000 });
         return result;
       }
     } catch (error) {
-      // Алдааны мессеж харуулах
       toast.error(
         isLogin
           ? "ログインに失敗しました。メールアドレスまたはパスワードを確認してください。"
-          : "アカウント登録に失敗しました。もう一度お試しください。"
+          : "アカウント登録に失敗しました。もう一度お試しください。",
+        { duration: 4000 }
       );
       console.error(error);
-      throw error; // Алдааг цааш дамжуулах
+      throw error;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center p-4 safe-area-inset font-japanese">
-      <Card className="w-full max-w-md mx-auto shadow-xl rounded-2xl">
+    <div
+      className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-100 to-teal-50 flex items-center justify-center p-4 font-japanese"
+      style={{
+        backgroundImage: "url('https://example.com/sakura-bg.jpg')", // Сакура дэвсгэрийн зураг (таны өөр зургийг ашиглаж болно)
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <Card className="w-full max-w-md mx-auto bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl p-6">
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-3xl font-bold text-gray-800 mb-2">
             親子日記
           </CardTitle>
-          <CardDescription className="text-gray-500 text-sm">
+          <CardDescription className="text-gray-600 text-sm">
             毎日の物語で心をつなぐ
           </CardDescription>
         </CardHeader>
@@ -64,24 +71,24 @@ export const AuthForm = ({ setUserType, userType }: AuthFormProps) => {
               type="button"
               variant={userType === "parent" ? "default" : "outline"}
               onClick={() => setUserType("parent")}
-              className="flex-1 h-12 rounded-full text-base font-medium"
+              className="flex-1 h-12 rounded-full text-base font-medium bg-teal-100 hover:bg-teal-200 text-gray-800"
             >
-              <Users className="w-5 h-5 mr-2" />
+              <Users className="w-5 h-5 mr-2 text-teal-600" />
               保護者
             </Button>
             <Button
               type="button"
               variant={userType === "child" ? "default" : "outline"}
               onClick={() => setUserType("child")}
-              className="flex-1 h-12 rounded-full text-base font-medium"
+              className="flex-1 h-12 rounded-full text-base font-medium bg-pink-100 hover:bg-pink-200 text-gray-800"
             >
-              <BookOpen className="w-5 h-5 mr-2" />
+              <BookOpen className="w-5 h-5 mr-2 text-pink-600" />
               お子様
             </Button>
           </div>
 
           {/* Mode-specific subtitle */}
-          <div className="text-sm text-center text-gray-600 mt-2">
+          <div className="text-sm text-center text-gray-700 mt-2">
             {userType === "parent"
               ? "保護者の方はこちらからログイン・登録してください"
               : "お子様は保護者の招待後にこちらからログイン"}
@@ -92,25 +99,23 @@ export const AuthForm = ({ setUserType, userType }: AuthFormProps) => {
 
           {/* Divider */}
           <div className="relative">
-            <Separator />
+            <Separator className="bg-gray-300" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="bg-white px-3 text-sm text-gray-500">
-                または
-              </span>
+              <span className="bg-white px-3 text-sm text-gray-500">または</span>
             </div>
           </div>
 
           {/* Email Form */}
           <EmailAuthForm isLogin={isLogin} onEmailAuth={handleEmailAuth} />
 
-          <Separator />
+          <Separator className="bg-gray-300" />
 
           {/* Toggle Link */}
           <Button
             type="button"
             variant="ghost"
             onClick={() => setIsLogin(!isLogin)}
-            className="w-full h-12 text-base"
+            className="w-full h-12 text-base text-gray-700 hover:text-teal-600"
           >
             {isLogin
               ? "アカウントをお持ちでない方は新規登録"
