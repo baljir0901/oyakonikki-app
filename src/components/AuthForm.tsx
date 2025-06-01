@@ -27,12 +27,12 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center p-4 safe-area-inset font-japanese">
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader className="text-center pb-4">
-          <div className="flex justify-center mb-4">
-            <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center shadow-lg">
-              <Heart className="w-10 h-10 text-white" />
+    // <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center p-4 safe-area-inset font-japanese">
+    //   <Card className="w-full max-w-md mx-auto">
+    //     <CardHeader className="text-center pb-4">
+    //       <div className="flex justify-center mb-4">
+    //         <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center shadow-lg">
+    //           <Heart className="w-10 h-10 text-white" />
             </div>
           </div>
           <CardTitle className="text-3xl font-bold text-gray-800 mb-2">
