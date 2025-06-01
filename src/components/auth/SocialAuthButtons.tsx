@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SocialAuthButtonsProps {
   onGoogleAuth: () => Promise<{ data: any; error: any }>;
@@ -28,11 +29,36 @@ export const SocialAuthButtons = ({ onGoogleAuth }: SocialAuthButtonsProps) => {
     }
   };
 
-  const handleLineAuth = () => {
-    toast({
-      title: "開発中",
-      description: "LINEログインは近日公開予定です",
-    });
+  const handleLineAuth = async () => {
+    try {
+      const lineChannelId = '2007511081'; // Your LINE Channel ID
+      const redirectUri = `${window.location.origin}/auth/line/callback`;
+      const state = btoa(JSON.stringify({ timestamp: Date.now() }));
+      
+      // Store state for verification
+      localStorage.setItem('line_auth_state', state);
+      
+      // Create LINE Login URL
+      const lineAuthUrl = new URL('https://access.line.me/oauth2/v2.1/authorize');
+      lineAuthUrl.searchParams.set('response_type', 'code');
+      lineAuthUrl.searchParams.set('client_id', lineChannelId);
+      lineAuthUrl.searchParams.set('redirect_uri', redirectUri);
+      lineAuthUrl.searchParams.set('state', state);
+      lineAuthUrl.searchParams.set('scope', 'profile openid email');
+      
+      console.log('Redirecting to LINE Login:', lineAuthUrl.toString());
+      
+      // Redirect to LINE Login
+      window.location.href = lineAuthUrl.toString();
+      
+    } catch (error) {
+      console.error('LINE auth error:', error);
+      toast({
+        title: "ログインエラー",
+        description: "LINEログインの初期化に失敗しました",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
