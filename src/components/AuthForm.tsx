@@ -6,7 +6,7 @@ import { BookOpen, Users } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { EmailAuthForm } from "./auth/EmailAuthForm";
 import { SocialAuthButtons } from "./auth/SocialAuthButtons";
-import { toast } from "sonner"; // Алдаа ба амжилтын мессеж харуулах
+import { toast } from "sonner";
 
 interface AuthFormProps {
   setUserType: (type: "parent" | "child") => void;
@@ -17,7 +17,6 @@ export const AuthForm = ({ setUserType, userType }: AuthFormProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const { signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
 
-  // Алдаа боловсруулалттай handleEmailAuth
   const handleEmailAuth = async (
     email: string,
     password: string,
@@ -49,7 +48,7 @@ export const AuthForm = ({ setUserType, userType }: AuthFormProps) => {
     <div
       className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-100 to-teal-50 flex items-center justify-center p-4 font-japanese"
       style={{
-        backgroundImage: "url('https://example.com/sakura-bg.jpg')", // Сакура дэвсгэрийн зураг (таны өөр зургийг ашиглаж болно)
+        backgroundImage: "url('https://example.com/sakura-bg.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -106,16 +105,20 @@ export const AuthForm = ({ setUserType, userType }: AuthFormProps) => {
           </div>
 
           {/* Email Form */}
-          <EmailAuthForm isLogin={isLogin} onEmailAuth={handleEmailAuth} />
+          <EmailAuthForm 
+            isLogin={isLogin} 
+            onEmailAuth={handleEmailAuth} 
+            loginButtonClass="bg-sakura hover:bg-sakura-hover text-white" // Логин товчлуурын шинэ класс
+          />
 
           <Separator className="bg-gray-300" />
 
-          {/* Toggle Link */}
+          {/* Toggle Link - Дизайн сайжруулсан */}
           <Button
             type="button"
             variant="ghost"
             onClick={() => setIsLogin(!isLogin)}
-            className="w-full h-12 text-base text-gray-700 hover:text-teal-600"
+            className="w-full h-10 text-sm text-rose-600 hover:text-rose-800 underline underline-offset-2 transition-colors duration-300"
           >
             {isLogin
               ? "アカウントをお持ちでない方は新規登録"
