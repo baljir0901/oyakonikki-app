@@ -99,10 +99,8 @@ Deno.serve(async (req) => {
     // Create a unique email for LINE users
     const lineEmail = `line_${profileData.userId}@line.local`
     
-    // Generate a deterministic UUID from the LINE user ID using a simpler method
+    // Generate a deterministic UUID from the LINE user ID
     const lineUserString = `line_${profileData.userId}`
-    
-    // Use crypto.randomUUID() and make it deterministic by using the LINE user ID as seed
     const encoder = new TextEncoder()
     const data = encoder.encode(lineUserString)
     const hashBuffer = await crypto.subtle.digest('SHA-256', data)
@@ -148,55 +146,70 @@ Deno.serve(async (req) => {
     } else {
       console.log('Creating new LINE user in auth system with UUID:', properUuid)
       
-      // Create new user in auth system
-      const { data: newUser, error: userError } = await supabase.auth.admin.createUser({
-        user_id: properUuid,
-        email: lineEmail,
-        email_confirm: true,
-        user_metadata: {
-          full_name: profileData.displayName,
-          avatar_url: profileData.pictureUrl,
-          provider: 'line',
-          line_user_id: profileData.userId
-        }
-      })
-
-      if (userError) {
-        console.error('Failed to create auth user:', userError)
-        throw new Error('Failed to create user account')
-      }
+      // First check if email already exists with a different user ID
+      const { data: existingEmailUser, error: emailCheckError } = await supabase.auth.admin.listUsers()
       
-      user = newUser.user
-      console.log('Successfully created new LINE user')
+      if (!emailCheckError) {
+        const userWithSameEmail = existingEmailUser.users.find(u => u.email === lineEmail)
+        if (userWithSameEmail) {
+          console.log('Found existing user with same LINE email, using existing user')
+          user = userWithSameEmail
+          
+          // Update metadata for existing user
+          const { error: updateError } = await supabase.auth.admin.updateUserById(userWithSameEmail.id, {
+            user_metadata: {
+              full_name: profileData.displayName,
+              avatar_url: profileData.pictureUrl,
+              provider: 'line',
+              line_user_id: profileData.userId
+            }
+          })
+
+          if (updateError) {
+            console.error('Failed to update existing user metadata:', updateError)
+          }
+        } else {
+          // Create new user
+          const { data: newUser, error: userError } = await supabase.auth.admin.createUser({
+            user_id: properUuid,
+            email: lineEmail,
+            email_confirm: true,
+            user_metadata: {
+              full_name: profileData.displayName,
+              avatar_url: profileData.pictureUrl,
+              provider: 'line',
+              line_user_id: profileData.userId
+            }
+          })
+
+          if (userError) {
+            console.error('Failed to create auth user:', userError)
+            throw new Error('Failed to create user account')
+          }
+          
+          user = newUser.user
+          console.log('Successfully created new LINE user')
+        }
+      } else {
+        console.error('Error checking for existing users:', emailCheckError)
+        throw new Error('Failed to verify user account')
+      }
     }
 
-    // Generate tokens using a simpler approach
+    // Generate session tokens
     const { data: sessionData, error: sessionError } = await supabase.auth.admin.generateLink({
-      type: 'signup',
-      email: lineEmail,
+      type: 'magiclink',
+      email: user.email!,
     })
 
     if (sessionError) {
       console.error('Failed to generate session:', sessionError)
-      // Try with magiclink instead
-      const { data: magicData, error: magicError } = await supabase.auth.admin.generateLink({
-        type: 'magiclink',
-        email: lineEmail,
-      })
-      
-      if (magicError) {
-        console.error('Failed to generate magic link:', magicError)
-        throw new Error('Failed to create user session')
-      }
-      
-      const url = new URL(magicData.properties.action_link)
-      accessToken = url.searchParams.get('access_token')
-      refreshToken = url.searchParams.get('refresh_token')
-    } else {
-      const url = new URL(sessionData.properties.action_link)
-      accessToken = url.searchParams.get('access_token')
-      refreshToken = url.searchParams.get('refresh_token')
+      throw new Error('Failed to create user session')
     }
+    
+    const url = new URL(sessionData.properties.action_link)
+    accessToken = url.searchParams.get('access_token')
+    refreshToken = url.searchParams.get('refresh_token')
 
     console.log('Generated session tokens successfully')
 
@@ -206,7 +219,7 @@ Deno.serve(async (req) => {
         user: {
           id: user.id,
           lineUserId: profileData.userId,
-          email: lineEmail,
+          email: user.email,
           name: profileData.displayName,
           avatar: profileData.pictureUrl,
           provider: 'line'

@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,32 +31,37 @@ export const SocialAuthButtons = ({ onGoogleAuth }: SocialAuthButtonsProps) => {
 
   const handleLineAuth = async () => {
     try {
-      const lineChannelId = '2007511081'; // Your LINE Channel ID
-      const redirectUri = `${window.location.origin}/auth/line/callback`;
-      const state = btoa(JSON.stringify({ timestamp: Date.now() }));
+      console.log('Starting LINE authentication...');
+      
+      // Call our edge function to get the LINE auth URL
+      const { data, error } = await supabase.functions.invoke('line-auth-url', {
+        body: {
+          redirectUri: `${window.location.origin}/auth/line/callback`
+        }
+      });
+
+      if (error) {
+        console.error('Error getting LINE auth URL:', error);
+        throw new Error('LINEログインURLの取得に失敗しました');
+      }
+
+      if (!data.authUrl) {
+        throw new Error('LINEログインURLが取得できませんでした');
+      }
+
+      console.log('Redirecting to LINE Login:', data.authUrl);
       
       // Store state for verification
-      localStorage.setItem('line_auth_state', state);
-      
-      // Create LINE Login URL
-      const lineAuthUrl = new URL('https://access.line.me/oauth2/v2.1/authorize');
-      lineAuthUrl.searchParams.set('response_type', 'code');
-      lineAuthUrl.searchParams.set('client_id', lineChannelId);
-      lineAuthUrl.searchParams.set('redirect_uri', redirectUri);
-      lineAuthUrl.searchParams.set('state', state);
-      lineAuthUrl.searchParams.set('scope', 'profile openid email');
-      
-      console.log('Redirecting to LINE Login:', lineAuthUrl.toString());
-      console.log('Redirect URI being sent:', redirectUri);
+      localStorage.setItem('line_auth_state', data.state);
       
       // Redirect to LINE Login
-      window.location.href = lineAuthUrl.toString();
+      window.location.href = data.authUrl;
       
     } catch (error) {
       console.error('LINE auth error:', error);
       toast({
         title: "ログインエラー",
-        description: "LINEログインの初期化に失敗しました",
+        description: error.message || "LINEログインの初期化に失敗しました",
         variant: "destructive",
       });
     }
