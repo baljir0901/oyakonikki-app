@@ -38,9 +38,11 @@ export const AddChildDialog = ({ open, onOpenChange, onSuccess }: AddChildDialog
     }
 
     setIsLoading(true);
+    console.log('Starting invitation process for:', childEmail.trim());
 
     try {
       // Create invitation
+      console.log('Creating invitation with user ID:', user.id);
       const { data: invitationData, error: invitationError } = await supabase
         .from('family_invitations')
         .insert({
@@ -56,23 +58,38 @@ export const AddChildDialog = ({ open, onOpenChange, onSuccess }: AddChildDialog
         console.error('Error creating invitation:', invitationError);
         toast({
           title: "エラー",
-          description: "招待の作成に失敗しました",
+          description: `招待の作成に失敗しました: ${invitationError.message}`,
           variant: "destructive",
         });
         return;
       }
 
+      console.log('Invitation created successfully:', invitationData);
+
       // Get user profile for name
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('full_name')
         .eq('id', user.id)
         .single();
 
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+      }
+
       const inviterName = profileData?.full_name || 'ユーザー';
+      console.log('Inviter name:', inviterName);
 
       // Send invitation email
-      const { error: emailError } = await supabase.functions.invoke('send-family-invitation', {
+      console.log('Sending invitation email with data:', {
+        invitationId: invitationData.id,
+        inviteeEmail: childEmail.trim(),
+        inviterName: inviterName,
+        inviterRole: 'parent',
+        invitationCode: invitationData.invitation_code
+      });
+
+      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-family-invitation', {
         body: {
           invitationId: invitationData.id,
           inviteeEmail: childEmail.trim(),
@@ -82,6 +99,8 @@ export const AddChildDialog = ({ open, onOpenChange, onSuccess }: AddChildDialog
         }
       });
 
+      console.log('Email function response:', emailData);
+
       if (emailError) {
         console.error('Error sending invitation email:', emailError);
         toast({
@@ -89,6 +108,7 @@ export const AddChildDialog = ({ open, onOpenChange, onSuccess }: AddChildDialog
           description: `招待コード: ${invitationData.invitation_code}（メール送信に失敗しましたが、招待コードを直接お伝えください）`,
         });
       } else {
+        console.log('Email sent successfully');
         toast({
           title: "招待を送信しました",
           description: `${childEmail} に招待メールを送信しました`,
@@ -99,7 +119,7 @@ export const AddChildDialog = ({ open, onOpenChange, onSuccess }: AddChildDialog
       onOpenChange(false);
       onSuccess();
     } catch (error) {
-      console.error('Error adding child:', error);
+      console.error('Unexpected error in handleAddChild:', error);
       toast({
         title: "エラー",
         description: "予期しないエラーが発生しました",
