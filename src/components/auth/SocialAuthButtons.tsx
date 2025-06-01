@@ -31,7 +31,7 @@ export const SocialAuthButtons = ({ onGoogleAuth }: SocialAuthButtonsProps) => {
   const handleLineAuth = async () => {
     try {
       const lineChannelId = '2007511081'; // Your LINE Channel ID
-      const redirectUri = 'https://lovable.app/auth/line/callback';
+      const redirectUri = `${window.location.origin}/auth/line/callback`;
       const state = btoa(JSON.stringify({ timestamp: Date.now() }));
       
       // Store state for verification

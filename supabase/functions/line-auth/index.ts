@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code: code,
-        redirect_uri: 'https://lovable.app/auth/line/callback',
+        redirect_uri: redirectUri,
         client_id: lineChannelId,
         client_secret: lineChannelSecret,
       }),
