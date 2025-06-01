@@ -99,22 +99,24 @@ Deno.serve(async (req) => {
     // Create a unique email for LINE users
     const lineEmail = `line_${profileData.userId}@line.local`
     
-    // Generate a deterministic UUID from the LINE user ID
+    // Generate a deterministic UUID from the LINE user ID using a simpler method
+    const lineUserString = `line_${profileData.userId}`
+    
+    // Use crypto.randomUUID() and make it deterministic by using the LINE user ID as seed
     const encoder = new TextEncoder()
-    const data = encoder.encode(`line_${profileData.userId}`)
+    const data = encoder.encode(lineUserString)
     const hashBuffer = await crypto.subtle.digest('SHA-256', data)
     const hashArray = new Uint8Array(hashBuffer)
     
-    // Create UUID v4 format from hash
-    const uuid = Array.from(hashArray.slice(0, 16))
-      .map((b, i) => {
-        if (i === 6) return ((b & 0x0f) | 0x40).toString(16).padStart(2, '0') // version 4
-        if (i === 8) return ((b & 0x3f) | 0x80).toString(16).padStart(2, '0') // variant bits
-        return b.toString(16).padStart(2, '0')
-      })
-      .join('')
-    
-    const properUuid = `${uuid.slice(0, 8)}-${uuid.slice(8, 12)}-${uuid.slice(12, 16)}-${uuid.slice(16, 20)}-${uuid.slice(20, 32)}`
+    // Create a proper UUID v4 format
+    const hex = Array.from(hashArray).map(b => b.toString(16).padStart(2, '0')).join('')
+    const properUuid = [
+      hex.slice(0, 8),
+      hex.slice(8, 12),
+      '4' + hex.slice(13, 16), // version 4
+      ((parseInt(hex.slice(16, 17), 16) & 0x3) | 0x8).toString(16) + hex.slice(17, 20), // variant bits
+      hex.slice(20, 32)
+    ].join('-')
 
     console.log('Generated UUID for LINE user:', properUuid)
 
@@ -143,25 +145,6 @@ Deno.serve(async (req) => {
         console.error('Failed to update user metadata:', updateError)
       }
       
-      // Generate new tokens for existing user
-      const { data: tokenData, error: tokenError } = await supabase.auth.admin.generateLink({
-        type: 'magiclink',
-        email: lineEmail,
-        options: {
-          redirectTo: redirectUri
-        }
-      })
-
-      if (tokenError) {
-        console.error('Failed to generate tokens:', tokenError)
-        throw new Error('Failed to create user session')
-      }
-      
-      // Extract tokens from the generated link
-      const url = new URL(tokenData.properties.action_link)
-      accessToken = url.searchParams.get('access_token')
-      refreshToken = url.searchParams.get('refresh_token')
-      
     } else {
       console.log('Creating new LINE user in auth system with UUID:', properUuid)
       
@@ -180,39 +163,37 @@ Deno.serve(async (req) => {
 
       if (userError) {
         console.error('Failed to create auth user:', userError)
-        // If user already exists, try to get them
-        if (userError.message.includes('already been registered')) {
-          const { data: existingUserData } = await supabase.auth.admin.getUserById(properUuid)
-          if (existingUserData.user) {
-            user = existingUserData.user
-            console.log('Using existing user after creation failed')
-          } else {
-            throw new Error('Failed to handle existing user')
-          }
-        } else {
-          throw new Error('Failed to create user account')
-        }
-      } else {
-        user = newUser.user
-        console.log('Successfully created new LINE user')
+        throw new Error('Failed to create user account')
       }
       
-      // Generate tokens for the user
-      const { data: tokenData, error: tokenError } = await supabase.auth.admin.generateLink({
+      user = newUser.user
+      console.log('Successfully created new LINE user')
+    }
+
+    // Generate tokens using a simpler approach
+    const { data: sessionData, error: sessionError } = await supabase.auth.admin.generateLink({
+      type: 'signup',
+      email: lineEmail,
+    })
+
+    if (sessionError) {
+      console.error('Failed to generate session:', sessionError)
+      // Try with magiclink instead
+      const { data: magicData, error: magicError } = await supabase.auth.admin.generateLink({
         type: 'magiclink',
         email: lineEmail,
-        options: {
-          redirectTo: redirectUri
-        }
       })
-
-      if (tokenError) {
-        console.error('Failed to generate tokens:', tokenError)
+      
+      if (magicError) {
+        console.error('Failed to generate magic link:', magicError)
         throw new Error('Failed to create user session')
       }
       
-      // Extract tokens from the generated link
-      const url = new URL(tokenData.properties.action_link)
+      const url = new URL(magicData.properties.action_link)
+      accessToken = url.searchParams.get('access_token')
+      refreshToken = url.searchParams.get('refresh_token')
+    } else {
+      const url = new URL(sessionData.properties.action_link)
       accessToken = url.searchParams.get('access_token')
       refreshToken = url.searchParams.get('refresh_token')
     }
