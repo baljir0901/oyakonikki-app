@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,7 +31,7 @@ export const SocialAuthButtons = ({ onGoogleAuth }: SocialAuthButtonsProps) => {
   const handleLineAuth = async () => {
     try {
       const lineChannelId = '2007511081'; // Your LINE Channel ID
-      const redirectUri = `${window.location.origin}/auth/line/callback`;
+      const redirectUri = 'https://lovable.app/auth/line/callback';
       const state = btoa(JSON.stringify({ timestamp: Date.now() }));
       
       // Store state for verification
@@ -47,6 +46,7 @@ export const SocialAuthButtons = ({ onGoogleAuth }: SocialAuthButtonsProps) => {
       lineAuthUrl.searchParams.set('scope', 'profile openid email');
       
       console.log('Redirecting to LINE Login:', lineAuthUrl.toString());
+      console.log('Redirect URI being sent:', redirectUri);
       
       // Redirect to LINE Login
       window.location.href = lineAuthUrl.toString();

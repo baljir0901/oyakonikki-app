@@ -1,4 +1,3 @@
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
@@ -43,6 +42,7 @@ Deno.serve(async (req) => {
     }
 
     console.log('Starting LINE authentication process')
+    console.log('Using redirect URI:', redirectUri)
 
     // Exchange authorization code for access token
     const tokenResponse = await fetch('https://api.line.me/oauth2/v2.1/token', {
@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code: code,
-        redirect_uri: redirectUri,
+        redirect_uri: 'https://lovable.app/auth/line/callback',
         client_id: lineChannelId,
         client_secret: lineChannelSecret,
       }),
