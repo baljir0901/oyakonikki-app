@@ -45,17 +45,10 @@ export const AuthForm = ({ setUserType, userType }: AuthFormProps) => {
   };
 
   return (
-    <div
-      className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-100 to-teal-50 flex items-center justify-center p-4 font-japanese"
-      style={{
-        backgroundImage: "url('https://example.com/sakura-bg.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      <Card className="w-full max-w-md mx-auto bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl p-6">
+    <div className="min-h-screen bg-pink-50 flex items-center justify-center p-4 font-japanese">
+      <Card className="w-full max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
         <CardHeader className="text-center pb-4">
-          <CardTitle className="text-3xl font-bold text-gray-800 mb-2">
+          <CardTitle className="text-2xl font-semibold text-gray-800">
             親子日記
           </CardTitle>
           <CardDescription className="text-gray-600 text-sm">
@@ -70,24 +63,24 @@ export const AuthForm = ({ setUserType, userType }: AuthFormProps) => {
               type="button"
               variant={userType === "parent" ? "default" : "outline"}
               onClick={() => setUserType("parent")}
-              className="flex-1 h-12 rounded-full text-base font-medium bg-teal-100 hover:bg-teal-200 text-gray-800"
+              className="flex-1 h-10 rounded-md text-sm font-medium bg-green-200 hover:bg-green-300 text-gray-800"
             >
-              <Users className="w-5 h-5 mr-2 text-teal-600" />
+              <Users className="w-4 h-4 mr-1 text-green-600" />
               保護者
             </Button>
             <Button
               type="button"
               variant={userType === "child" ? "default" : "outline"}
               onClick={() => setUserType("child")}
-              className="flex-1 h-12 rounded-full text-base font-medium bg-pink-100 hover:bg-pink-200 text-gray-800"
+              className="flex-1 h-10 rounded-md text-sm font-medium bg-pink-200 hover:bg-pink-300 text-gray-800"
             >
-              <BookOpen className="w-5 h-5 mr-2 text-pink-600" />
+              <BookOpen className="w-4 h-4 mr-1 text-pink-600" />
               お子様
             </Button>
           </div>
 
           {/* Mode-specific subtitle */}
-          <div className="text-sm text-center text-gray-700 mt-2">
+          <div className="text-xs text-center text-gray-600 mt-1">
             {userType === "parent"
               ? "保護者の方はこちらからログイン・登録してください"
               : "お子様は保護者の招待後にこちらからログイン"}
@@ -98,9 +91,9 @@ export const AuthForm = ({ setUserType, userType }: AuthFormProps) => {
 
           {/* Divider */}
           <div className="relative">
-            <Separator className="bg-gray-300" />
+            <Separator className="bg-gray-200" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="bg-white px-3 text-sm text-gray-500">または</span>
+              <span className="bg-white px-2 text-xs text-gray-500">または</span>
             </div>
           </div>
 
@@ -108,17 +101,17 @@ export const AuthForm = ({ setUserType, userType }: AuthFormProps) => {
           <EmailAuthForm 
             isLogin={isLogin} 
             onEmailAuth={handleEmailAuth} 
-            loginButtonClass="bg-sakura hover:bg-sakura-hover text-white" // Логин товчлуурын шинэ класс
+            loginButtonClass="bg-gray-900 hover:bg-gray-800 text-white rounded-md" // Логин товчлуур хар өнгөтэй
           />
 
-          <Separator className="bg-gray-300" />
+          <Separator className="bg-gray-200" />
 
           {/* Toggle Link - Дизайн сайжруулсан */}
           <Button
             type="button"
             variant="ghost"
             onClick={() => setIsLogin(!isLogin)}
-            className="w-full h-10 text-sm text-rose-600 hover:text-rose-800 underline underline-offset-2 transition-colors duration-300"
+            className="w-full h-8 text-sm text-pink-500 hover:text-pink-700 underline underline-offset-2 transition-colors duration-200"
           >
             {isLogin
               ? "アカウントをお持ちでない方は新規登録"
