@@ -126,7 +126,7 @@ export const EmailAuthForm = ({ isLogin, onEmailAuth }: EmailAuthFormProps) => {
       
       <Button 
         type="submit" 
-        className="w-full h-12 text-base font-medium"
+        className="w-full h-12 text-base font-medium gray-600"
         disabled={loading}
       >
         {loading ? "処理中..." : (isLogin ? 'ログイン' : '新規登録')}
