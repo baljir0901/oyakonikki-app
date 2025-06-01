@@ -1,7 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -26,6 +25,14 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { invitationId, inviteeEmail, inviterName, inviterRole, invitationCode }: FamilyInvitationRequest = await req.json();
+
+    console.log('Sending family invitation email:', {
+      invitationId,
+      inviteeEmail,
+      inviterName,
+      inviterRole,
+      invitationCode
+    });
 
     const roleText = inviterRole === 'parent' ? '保護者' : 'お子様';
     const appUrl = 'https://preview--oyakoni-diary-bridge.lovable.app';
