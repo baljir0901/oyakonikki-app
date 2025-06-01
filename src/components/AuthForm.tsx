@@ -38,7 +38,7 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
         </CardHeader>
 
         <CardContent className="space-y-6 px-6 pb-6">
-          <h2 className="text-center text-lg font-semibold text-gray-700">
+          <h2 className="text-center text-lg font-semibold text-gray-500">
             {isLogin ? 'ログイン' : '新規登録'}
           </h2>
 
