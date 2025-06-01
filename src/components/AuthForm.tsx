@@ -38,9 +38,7 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
           <CardTitle className="text-3xl font-bold text-gray-800 mb-2">
             親子日記
           </CardTitle>
-          <CardDescription className="text-xl text-gray-600 font-medium">
-            Oyako Nikki
-          </CardDescription>
+
           <p className="text-sm text-gray-500 mt-2">
             毎日の物語で心をつなぐ
           </p>
