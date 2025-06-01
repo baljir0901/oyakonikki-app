@@ -55,6 +55,25 @@ export const LineCallback = () => {
 
         console.log('LINE authentication successful:', data.user);
 
+        // If we have a Supabase session, set it
+        if (data.supabaseSession && data.supabaseSession.properties) {
+          const { access_token, refresh_token } = data.supabaseSession.properties;
+          
+          if (access_token && refresh_token) {
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token,
+              refresh_token
+            });
+
+            if (sessionError) {
+              console.error('Failed to set Supabase session:', sessionError);
+              throw new Error('セッションの設定に失敗しました');
+            }
+            
+            console.log('Supabase session set successfully');
+          }
+        }
+
         toast({
           title: "ログイン成功",
           description: `${data.user.name}さん、おかえりなさい！`,

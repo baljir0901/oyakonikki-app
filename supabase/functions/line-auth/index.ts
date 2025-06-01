@@ -89,9 +89,14 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
 
-    // Create a unique email for LINE users and generate a proper UUID
+    // Create a unique email for LINE users
     const lineEmail = `line_${profileData.userId}@line.local`
     
     // Generate a deterministic UUID from the LINE user ID
@@ -111,40 +116,75 @@ Deno.serve(async (req) => {
     
     const properUuid = `${uuid.slice(0, 8)}-${uuid.slice(8, 12)}-${uuid.slice(12, 16)}-${uuid.slice(16, 20)}-${uuid.slice(20, 32)}`
 
-    // Check if user already exists
-    const { data: existingUser } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', properUuid)
-      .single()
+    console.log('Generated UUID for LINE user:', properUuid)
+
+    // Check if user already exists in auth.users
+    const { data: existingUser } = await supabase.auth.admin.getUserById(properUuid)
 
     let user
-    if (existingUser) {
-      console.log('Existing LINE user found')
-      user = existingUser
+    let sessionData
+    
+    if (existingUser.user) {
+      console.log('Existing LINE user found in auth system')
+      user = existingUser.user
+      
+      // Create a session for the existing user
+      const { data: session, error: sessionError } = await supabase.auth.admin.generateLink({
+        type: 'magiclink',
+        email: lineEmail,
+        options: {
+          redirectTo: redirectUri
+        }
+      })
+
+      if (sessionError) {
+        console.error('Failed to generate session:', sessionError)
+        throw new Error('Failed to create user session')
+      }
+      
+      sessionData = session
     } else {
-      console.log('Creating new LINE user with UUID:', properUuid)
-      // Create new user profile
-      const { data: newUser, error: userError } = await supabase
-        .from('profiles')
-        .insert({
-          id: properUuid,
-          email: lineEmail,
+      console.log('Creating new LINE user in auth system with UUID:', properUuid)
+      
+      // Create new user in auth system
+      const { data: newUser, error: userError } = await supabase.auth.admin.createUser({
+        user_id: properUuid,
+        email: lineEmail,
+        email_confirm: true,
+        user_metadata: {
           full_name: profileData.displayName,
-          avatar_url: profileData.pictureUrl || null,
-          provider: 'line'
-        })
-        .select()
-        .single()
+          avatar_url: profileData.pictureUrl,
+          provider: 'line',
+          line_user_id: profileData.userId
+        }
+      })
 
       if (userError) {
-        console.error('Failed to create user profile:', userError)
-        throw new Error('Failed to create user profile')
+        console.error('Failed to create auth user:', userError)
+        throw new Error('Failed to create user account')
       }
-      user = newUser
+      
+      user = newUser.user
+      console.log('Successfully created new LINE user')
+      
+      // Generate a session for the new user
+      const { data: session, error: sessionError } = await supabase.auth.admin.generateLink({
+        type: 'magiclink',
+        email: lineEmail,
+        options: {
+          redirectTo: redirectUri
+        }
+      })
+
+      if (sessionError) {
+        console.error('Failed to generate session:', sessionError)
+        throw new Error('Failed to create user session')
+      }
+      
+      sessionData = session
     }
 
-    // Generate a session token (you might want to use a proper JWT library)
+    // Generate a custom session token for the client
     const sessionToken = btoa(JSON.stringify({
       userId: properUuid,
       lineUserId: profileData.userId,
@@ -152,7 +192,8 @@ Deno.serve(async (req) => {
       name: profileData.displayName,
       avatar: profileData.pictureUrl,
       provider: 'line',
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      accessToken: tokenData.access_token
     }))
 
     return new Response(
@@ -166,7 +207,8 @@ Deno.serve(async (req) => {
           avatar: profileData.pictureUrl,
           provider: 'line'
         },
-        sessionToken
+        sessionToken,
+        supabaseSession: sessionData
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
