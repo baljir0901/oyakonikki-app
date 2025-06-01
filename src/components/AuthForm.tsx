@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,7 @@ interface AuthFormProps {
 
 export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthFormProps) => {
   const [isLogin, setIsLogin] = useState(true);
-  const { signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
+  const { signInWithEmail, signUpWithEmail, signInWithGoogle, resetPassword } = useAuth();
 
   const handleEmailAuth = async (email: string, password: string, isLogin: boolean) => {
     if (isLogin) {
@@ -27,12 +28,20 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
     return await signInWithGoogle();
   };
 
+  const handleResetPassword = async (email: string) => {
+    return await resetPassword(email);
+  };
+
+  const toggleMode = () => {
+    setIsLogin(!isLogin);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-japanese">
       <Card className="w-full max-w-md shadow-xl rounded-2xl">
         <CardHeader className="text-center space-y-1">
           <CardTitle className="text-3xl font-bold text-gray-800">親子日記</CardTitle>
-          <CardDescription className="text-sm text-gray-500">
+          <CardDescription className="text-sm text-gray-500 break-words">
             家族の思い出を残そう
           </CardDescription>
         </CardHeader>
@@ -59,6 +68,8 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
           <EmailAuthForm
             isLogin={isLogin}
             onEmailAuth={handleEmailAuth}
+            onResetPassword={handleResetPassword}
+            onToggleMode={toggleMode}
           />
 
           {/* Switch mode */}
@@ -66,7 +77,7 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
             <Button
               type="button"
               variant="link"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={toggleMode}
               className="text-sm text-blue-600 hover:text-blue-800"
             >
               {isLogin ? '新規アカウントを作成' : 'ログインはこちら'}
