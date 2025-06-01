@@ -38,38 +38,88 @@ export const AddParentDialog = ({ open, onOpenChange, onSuccess }: AddParentDial
     }
 
     setIsLoading(true);
+    console.log('Starting parent invitation process for:', parentEmail.trim());
 
     try {
       // Create invitation (child inviting parent)
-      const { error: invitationError } = await supabase
+      console.log('Creating parent invitation with user ID:', user.id);
+      const { data: invitationData, error: invitationError } = await supabase
         .from('family_invitations')
         .insert({
           inviter_id: user.id,
           invitee_email: parentEmail.trim(),
           relationship_type: 'parent_child',
           inviter_role: 'child'
-        });
+        })
+        .select()
+        .single();
 
       if (invitationError) {
-        console.error('Error creating invitation:', invitationError);
+        console.error('Error creating parent invitation:', invitationError);
         toast({
           title: "エラー",
-          description: "招待の送信に失敗しました",
+          description: `招待の作成に失敗しました: ${invitationError.message}`,
           variant: "destructive",
         });
         return;
       }
 
-      toast({
-        title: "招待を送信しました",
-        description: `${parentEmail} に招待メールを送信しました`,
+      console.log('Parent invitation created successfully:', invitationData);
+
+      // Get user profile for name
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+      }
+
+      const inviterName = profileData?.full_name || 'ユーザー';
+      console.log('Child inviter name:', inviterName);
+
+      // Send invitation email
+      console.log('Sending parent invitation email with data:', {
+        invitationId: invitationData.id,
+        inviteeEmail: parentEmail.trim(),
+        inviterName: inviterName,
+        inviterRole: 'child',
+        invitationCode: invitationData.invitation_code
       });
+
+      const { data: emailData, error: emailError } = await supabase.functions.invoke('send-family-invitation', {
+        body: {
+          invitationId: invitationData.id,
+          inviteeEmail: parentEmail.trim(),
+          inviterName: inviterName,
+          inviterRole: 'child',
+          invitationCode: invitationData.invitation_code
+        }
+      });
+
+      console.log('Parent invitation email function response:', emailData);
+
+      if (emailError) {
+        console.error('Error sending parent invitation email:', emailError);
+        toast({
+          title: "招待を作成しました",
+          description: `招待コード: ${invitationData.invitation_code}（メール送信に失敗しましたが、招待コードを直接お伝えください）`,
+        });
+      } else {
+        console.log('Parent invitation email sent successfully');
+        toast({
+          title: "招待を送信しました",
+          description: `${parentEmail} に招待メールを送信しました`,
+        });
+      }
 
       setParentEmail('');
       onOpenChange(false);
       onSuccess();
     } catch (error) {
-      console.error('Error adding parent:', error);
+      console.error('Unexpected error in handleAddParent:', error);
       toast({
         title: "エラー",
         description: "予期しないエラーが発生しました",
