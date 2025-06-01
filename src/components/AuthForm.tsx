@@ -101,12 +101,12 @@ export const AuthForm = ({ setUserType, userType }: AuthFormProps) => {
           <EmailAuthForm 
             isLogin={isLogin} 
             onEmailAuth={handleEmailAuth} 
-            loginButtonClass="bg-gray-900 hover:bg-gray-800 text-white rounded-md" // Логин товчлуур хар өнгөтэй
+            loginButtonClass="bg-sakura hover:bg-sakura-hover text-gray-800 rounded-md" // Логин товчлуур зөөлөн ягаан болсон
           />
 
           <Separator className="bg-gray-200" />
 
-          {/* Toggle Link - Дизайн сайжруулсан */}
+          {/* Toggle Link */}
           <Button
             type="button"
             variant="ghost"
