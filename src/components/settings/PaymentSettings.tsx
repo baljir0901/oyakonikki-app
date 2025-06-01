@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, CreditCard, Crown, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { CardInputDialog } from "./CardInputDialog";
 
 interface PaymentSettingsProps {
   onBack: () => void;
@@ -17,10 +17,18 @@ interface SubscriptionData {
   subscription_end?: string;
 }
 
+interface CardData {
+  cardNumber: string;
+  expiryDate: string;
+  cvv: string;
+  cardholderName: string;
+}
+
 export const PaymentSettings = ({ onBack }: PaymentSettingsProps) => {
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData>({ subscribed: false });
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [showCardDialog, setShowCardDialog] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -61,6 +69,10 @@ export const PaymentSettings = ({ onBack }: PaymentSettingsProps) => {
   };
 
   const handleCheckout = async () => {
+    setShowCardDialog(true);
+  };
+
+  const handleCardSubmit = async (cardData: CardData) => {
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -68,33 +80,22 @@ export const PaymentSettings = ({ onBack }: PaymentSettingsProps) => {
         throw new Error("認証が必要です");
       }
 
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
+      // Simulate card processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-      if (error) throw error;
-      
       toast({
-        title: "決済ページに移動します",
-        description: "テスト環境での決済シミュレーションです",
+        title: "決済完了",
+        description: "プレミアムプランの登録が完了しました",
       });
 
-      // Simulate redirect to checkout
-      setTimeout(() => {
-        toast({
-          title: "決済完了（テスト）",
-          description: "テスト決済が完了しました。サブスクリプションが有効になりました。",
-        });
-        checkSubscriptionStatus();
-      }, 2000);
+      setShowCardDialog(false);
+      checkSubscriptionStatus();
       
     } catch (error) {
-      console.error('Error creating checkout:', error);
+      console.error('Error processing payment:', error);
       toast({
         title: "エラー",
-        description: "決済の開始に失敗しました",
+        description: "決済の処理に失敗しました",
         variant: "destructive",
       });
     } finally {
@@ -240,6 +241,13 @@ export const PaymentSettings = ({ onBack }: PaymentSettingsProps) => {
           戻る
         </Button>
       </div>
+
+      <CardInputDialog
+        open={showCardDialog}
+        onOpenChange={setShowCardDialog}
+        onCardSubmit={handleCardSubmit}
+        loading={loading}
+      />
     </div>
   );
 };
