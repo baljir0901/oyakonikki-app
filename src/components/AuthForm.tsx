@@ -29,18 +29,15 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center font-japanese p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center font-japanese p-4">
       <div className="w-full max-w-md">
-        {/* Header */}
+        {/* Header - No logo */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-white text-2xl font-bold">親</span>
-          </div>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">親子日記</h1>
           <p className="text-gray-600">家族の思い出を残そう</p>
         </div>
 
-        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+        <Card className="shadow-lg border border-gray-200 bg-white">
           <CardHeader className="text-center pb-4">
             <CardTitle className="text-xl text-gray-800">
               {isLogin ? 'ログイン' : '新規登録'}
@@ -57,7 +54,7 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
                     type="button"
                     variant={userType === 'parent' ? 'default' : 'outline'}
                     onClick={() => setUserType('parent')}
-                    className="h-12"
+                    className="h-12 bg-pink-100 hover:bg-pink-200 text-pink-800 border-pink-200"
                   >
                     保護者
                   </Button>
@@ -65,7 +62,7 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
                     type="button"
                     variant={userType === 'child' ? 'default' : 'outline'}
                     onClick={() => setUserType('child')}
-                    className="h-12"
+                    className="h-12 bg-purple-100 hover:bg-purple-200 text-purple-800 border-purple-200"
                   >
                     子ども
                   </Button>
@@ -98,7 +95,7 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
                 type="button"
                 variant="ghost"
                 onClick={() => setIsLogin(!isLogin)}
-                className="text-sm text-gray-600 hover:text-gray-800"
+                className="text-sm text-pink-600 hover:text-pink-800 hover:bg-pink-50"
               >
                 {isLogin ? '新規アカウントを作成' : 'ログインはこちら'}
               </Button>
