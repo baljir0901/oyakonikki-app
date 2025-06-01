@@ -1,6 +1,6 @@
 
 import { useAuth } from "@/hooks/useAuth";
-import { EmailAuthForm } from "@/components/AuthForm";
+import { AuthForm } from "@/components/AuthForm";
 import { DashboardView } from "@/components/DashboardView";
 import { useState } from "react";
 
@@ -26,7 +26,7 @@ const Index = () => {
   }
 
   return (
-    <EmailAuthForm 
+    <AuthForm 
       setIsAuthenticated={() => {}} 
       setUserType={setUserType} 
       userType={userType} 
