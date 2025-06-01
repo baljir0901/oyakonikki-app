@@ -41,29 +41,59 @@ export const AddChildDialog = ({ open, onOpenChange, onSuccess }: AddChildDialog
 
     try {
       // Create invitation
-      const { error: invitationError } = await supabase
+      const { data: invitationData, error: invitationError } = await supabase
         .from('family_invitations')
         .insert({
           inviter_id: user.id,
           invitee_email: childEmail.trim(),
           relationship_type: 'parent_child',
           inviter_role: 'parent'
-        });
+        })
+        .select()
+        .single();
 
       if (invitationError) {
         console.error('Error creating invitation:', invitationError);
         toast({
           title: "エラー",
-          description: "招待の送信に失敗しました",
+          description: "招待の作成に失敗しました",
           variant: "destructive",
         });
         return;
       }
 
-      toast({
-        title: "招待を送信しました",
-        description: `${childEmail} に招待メールを送信しました`,
+      // Get user profile for name
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+
+      const inviterName = profileData?.full_name || 'ユーザー';
+
+      // Send invitation email
+      const { error: emailError } = await supabase.functions.invoke('send-family-invitation', {
+        body: {
+          invitationId: invitationData.id,
+          inviteeEmail: childEmail.trim(),
+          inviterName: inviterName,
+          inviterRole: 'parent',
+          invitationCode: invitationData.invitation_code
+        }
       });
+
+      if (emailError) {
+        console.error('Error sending invitation email:', emailError);
+        toast({
+          title: "招待を作成しました",
+          description: `招待コード: ${invitationData.invitation_code}（メール送信に失敗しましたが、招待コードを直接お伝えください）`,
+        });
+      } else {
+        toast({
+          title: "招待を送信しました",
+          description: `${childEmail} に招待メールを送信しました`,
+        });
+      }
 
       setChildEmail('');
       onOpenChange(false);
