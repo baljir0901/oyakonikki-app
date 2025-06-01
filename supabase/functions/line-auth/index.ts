@@ -122,14 +122,29 @@ Deno.serve(async (req) => {
     const { data: existingUser } = await supabase.auth.admin.getUserById(properUuid)
 
     let user
-    let sessionData
+    let accessToken
+    let refreshToken
     
     if (existingUser.user) {
       console.log('Existing LINE user found in auth system')
       user = existingUser.user
       
-      // Create a session for the existing user
-      const { data: session, error: sessionError } = await supabase.auth.admin.generateLink({
+      // Update user metadata if needed
+      const { error: updateError } = await supabase.auth.admin.updateUserById(properUuid, {
+        user_metadata: {
+          full_name: profileData.displayName,
+          avatar_url: profileData.pictureUrl,
+          provider: 'line',
+          line_user_id: profileData.userId
+        }
+      })
+
+      if (updateError) {
+        console.error('Failed to update user metadata:', updateError)
+      }
+      
+      // Generate new tokens for existing user
+      const { data: tokenData, error: tokenError } = await supabase.auth.admin.generateLink({
         type: 'magiclink',
         email: lineEmail,
         options: {
@@ -137,12 +152,16 @@ Deno.serve(async (req) => {
         }
       })
 
-      if (sessionError) {
-        console.error('Failed to generate session:', sessionError)
+      if (tokenError) {
+        console.error('Failed to generate tokens:', tokenError)
         throw new Error('Failed to create user session')
       }
       
-      sessionData = session
+      // Extract tokens from the generated link
+      const url = new URL(tokenData.properties.action_link)
+      accessToken = url.searchParams.get('access_token')
+      refreshToken = url.searchParams.get('refresh_token')
+      
     } else {
       console.log('Creating new LINE user in auth system with UUID:', properUuid)
       
@@ -161,14 +180,25 @@ Deno.serve(async (req) => {
 
       if (userError) {
         console.error('Failed to create auth user:', userError)
-        throw new Error('Failed to create user account')
+        // If user already exists, try to get them
+        if (userError.message.includes('already been registered')) {
+          const { data: existingUserData } = await supabase.auth.admin.getUserById(properUuid)
+          if (existingUserData.user) {
+            user = existingUserData.user
+            console.log('Using existing user after creation failed')
+          } else {
+            throw new Error('Failed to handle existing user')
+          }
+        } else {
+          throw new Error('Failed to create user account')
+        }
+      } else {
+        user = newUser.user
+        console.log('Successfully created new LINE user')
       }
       
-      user = newUser.user
-      console.log('Successfully created new LINE user')
-      
-      // Generate a session for the new user
-      const { data: session, error: sessionError } = await supabase.auth.admin.generateLink({
+      // Generate tokens for the user
+      const { data: tokenData, error: tokenError } = await supabase.auth.admin.generateLink({
         type: 'magiclink',
         email: lineEmail,
         options: {
@@ -176,39 +206,36 @@ Deno.serve(async (req) => {
         }
       })
 
-      if (sessionError) {
-        console.error('Failed to generate session:', sessionError)
+      if (tokenError) {
+        console.error('Failed to generate tokens:', tokenError)
         throw new Error('Failed to create user session')
       }
       
-      sessionData = session
+      // Extract tokens from the generated link
+      const url = new URL(tokenData.properties.action_link)
+      accessToken = url.searchParams.get('access_token')
+      refreshToken = url.searchParams.get('refresh_token')
     }
 
-    // Generate a custom session token for the client
-    const sessionToken = btoa(JSON.stringify({
-      userId: properUuid,
-      lineUserId: profileData.userId,
-      email: lineEmail,
-      name: profileData.displayName,
-      avatar: profileData.pictureUrl,
-      provider: 'line',
-      timestamp: Date.now(),
-      accessToken: tokenData.access_token
-    }))
+    console.log('Generated session tokens successfully')
 
     return new Response(
       JSON.stringify({
         success: true,
         user: {
-          id: properUuid,
+          id: user.id,
           lineUserId: profileData.userId,
           email: lineEmail,
           name: profileData.displayName,
           avatar: profileData.pictureUrl,
           provider: 'line'
         },
-        sessionToken,
-        supabaseSession: sessionData
+        supabaseSession: {
+          properties: {
+            access_token: accessToken,
+            refresh_token: refreshToken
+          }
+        }
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
