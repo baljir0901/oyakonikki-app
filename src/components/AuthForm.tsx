@@ -33,8 +33,8 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
       <div className="w-full max-w-md">
         {/* Header - No logo */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">親子日記</h1>
-          <p className="text-gray-600">家族の思い出を残そう</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-3">親子日記</h1>
+          <p className="text-gray-600 text-base leading-relaxed px-4">家族の思い出を残そう</p>
         </div>
 
         <Card className="shadow-lg border border-gray-200 bg-white">
@@ -95,7 +95,7 @@ export const AuthForm = ({ setIsAuthenticated, setUserType, userType }: AuthForm
                 type="button"
                 variant="ghost"
                 onClick={() => setIsLogin(!isLogin)}
-                className="text-sm text-pink-600 hover:text-pink-800 hover:bg-pink-50"
+                className="text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50"
               >
                 {isLogin ? '新規アカウントを作成' : 'ログインはこちら'}
               </Button>
