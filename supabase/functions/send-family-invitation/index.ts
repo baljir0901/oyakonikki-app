@@ -26,7 +26,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { invitationId, inviteeEmail, inviterName, inviterRole, invitationCode }: FamilyInvitationRequest = await req.json();
 
-    console.log('Sending family invitation email:', {
+    console.log('Sending family invitation email (TEST MODE - ALL EMAILS ALLOWED):', {
       invitationId,
       inviteeEmail,
       inviterName,
@@ -37,13 +37,14 @@ const handler = async (req: Request): Promise<Response> => {
     const roleText = inviterRole === 'parent' ? '保護者' : 'お子様';
     const appUrl = 'https://preview--oyakoni-diary-bridge.lovable.app';
 
+    // For testing - always send email without any restrictions
     const emailResponse = await resend.emails.send({
       from: "親子日記 <onboarding@resend.dev>",
       to: [inviteeEmail],
-      subject: `${roleText}からの家族招待`,
+      subject: `${roleText}からの家族招待 (テスト版)`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #333; text-align: center;">家族招待</h1>
+          <h1 style="color: #333; text-align: center;">家族招待 (テスト版)</h1>
           
           <p>こんにちは！</p>
           
@@ -61,21 +62,25 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           
           <p style="font-size: 14px; color: #666;">
-            ※ このメールに心当たりがない場合は、無視していただいて構いません。
+            ※ このメールはテスト版です。実際のサービスではありません。
           </p>
           
           <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
           
           <p style="font-size: 12px; color: #999; text-align: center;">
-            親子日記アプリ
+            親子日記アプリ (テスト版)
           </p>
         </div>
       `,
     });
 
-    console.log("Family invitation email sent successfully:", emailResponse);
+    console.log("Family invitation email sent successfully (TEST MODE):", emailResponse);
 
-    return new Response(JSON.stringify({ success: true, emailResponse }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      emailResponse,
+      message: "Email sent in test mode - all emails allowed"
+    }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
@@ -83,9 +88,12 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
   } catch (error: any) {
-    console.error("Error sending family invitation email:", error);
+    console.error("Error sending family invitation email (TEST MODE):", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        message: "Error in test mode"
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
