@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Search, MoreHorizontal, Eye, Trash2, FileText, BookOpen, Calendar } from "lucide-react";
+import { Search, MoreHorizontal, Eye, Trash2, Download, Database, FileText, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -27,10 +26,8 @@ interface DiaryEntry {
   content: string;
   mood: string;
   created_at: string;
-  profiles: {
-    full_name: string;
-    email: string;
-  };
+  user_name?: string;
+  user_email?: string;
 }
 
 export const DataManagement = () => {
@@ -52,16 +49,23 @@ export const DataManagement = () => {
           content,
           mood,
           created_at,
-          profiles (
-            full_name,
-            email
-          )
+          user_id,
+          profiles!inner(full_name, email)
         `)
-        .order('created_at', { ascending: false })
-        .limit(100);
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setEntries(data || []);
+      
+      const processedData = data?.map(entry => ({
+        id: entry.id,
+        content: entry.content,
+        mood: entry.mood,
+        created_at: entry.created_at,
+        user_name: entry.profiles?.full_name || 'Unknown',
+        user_email: entry.profiles?.email || 'Unknown'
+      })) || [];
+      
+      setEntries(processedData);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -75,7 +79,7 @@ export const DataManagement = () => {
 
   const filteredEntries = entries.filter(entry =>
     entry.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    entry.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    entry.user_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalEntries = entries.length;
@@ -113,6 +117,44 @@ export const DataManagement = () => {
       'neutral': 'bg-gray-100 text-gray-800'
     };
     return colorMap[mood] || 'bg-gray-100 text-gray-800';
+  };
+
+  const exportData = (entries: DiaryEntry[]) => {
+    const csvContent = entries.map(entry => {
+      return [
+        entry.user_name || 'Unknown',
+        entry.mood,
+        entry.content,
+        new Date(entry.created_at).toLocaleDateString()
+      ].join(',');
+    }).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'diary_entries.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const deleteEntry = async (entryId: string) => {
+    try {
+      const { error } = await supabase
+        .from('diary_entries')
+        .delete()
+        .eq('id', entryId);
+
+      if (error) throw error;
+      setEntries(entries.filter(entry => entry.id !== entryId));
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to delete diary entry",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {
@@ -226,13 +268,13 @@ export const DataManagement = () => {
                     <TableCell>
                       <div className="flex items-center space-x-3">
                         <div className="w-8 h-8 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                          {entry.profiles?.full_name 
-                            ? entry.profiles.full_name.charAt(0).toUpperCase() 
+                          {entry.user_name 
+                            ? entry.user_name.charAt(0).toUpperCase() 
                             : 'U'}
                         </div>
                         <div>
                           <p className="font-medium text-gray-900">
-                            {entry.profiles?.full_name || 'Unknown User'}
+                            {entry.user_name || 'Unknown User'}
                           </p>
                         </div>
                       </div>

@@ -35,14 +35,16 @@ export const DashboardView = ({ userType }: DashboardViewProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 safe-area-inset font-japanese">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 safe-area-inset font-japanese">
       <MobileHeader userType={userType} />
 
-      <main className="px-4 py-6 pb-24">
-        {activeTab === 'home' && <HomeTab userType={userType} />}
-        {activeTab === 'write' && <WriteTab userType={userType} />}
-        {activeTab === 'calendar' && <CalendarTab />}
-        {activeTab === 'profile' && <ProfileTab userType={userType} onSignOut={handleSignOut} />}
+      <main className="px-6 py-8 pb-28 min-h-screen">
+        <div className="max-w-md mx-auto">
+          {activeTab === 'home' && <HomeTab userType={userType} />}
+          {activeTab === 'write' && <WriteTab userType={userType} />}
+          {activeTab === 'calendar' && <CalendarTab />}
+          {activeTab === 'profile' && <ProfileTab userType={userType} onSignOut={handleSignOut} />}
+        </div>
       </main>
 
       <MobileNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
