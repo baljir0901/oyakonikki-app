@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -73,20 +72,20 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">
+        <h2 className="text-2xl font-bold text-amber-800 mb-3">
           今日の日記を書きましょう
         </h2>
-        <p className="text-gray-600">
+        <p className="text-amber-700">
           {userType === 'child' 
             ? "今日の出来事を家族と共有しましょう" 
             : "今日のことを書いてみましょう"}
         </p>
       </div>
 
-      <Card>
+      <Card className="bg-yellow-50/80 border-yellow-200">
         <CardContent className="p-6 space-y-6">
           <div>
-            <Label htmlFor="diary-entry" className="text-lg font-semibold text-gray-700 mb-3 block">
+            <Label htmlFor="diary-entry" className="text-lg font-semibold text-amber-800 mb-3 block">
               今日のことを書いてください
             </Label>
             <textarea
@@ -100,13 +99,13 @@ export const WriteTab = ({ userType }: WriteTabProps) => {
                 ? "今日は何がありましたか？どんな気持ちでしたか？"
                 : "今日の出来事について書いてください..."
               }
-              className="w-full p-4 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base leading-relaxed"
+              className="w-full p-4 border border-yellow-300 rounded-xl resize-none focus:ring-2 focus:ring-amber-500 focus:border-transparent text-base leading-relaxed bg-white/90"
               rows={12}
             />
           </div>
 
           <Button 
-            className="w-full h-14 text-lg font-semibold" 
+            className="w-full h-14 text-lg font-semibold bg-amber-500 hover:bg-amber-600" 
             disabled={isButtonDisabled}
             onClick={handleSave}
           >

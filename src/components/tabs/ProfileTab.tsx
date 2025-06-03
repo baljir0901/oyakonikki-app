@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -85,37 +84,37 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-700 mb-3">
+        <h2 className="text-2xl font-bold text-amber-800 mb-3">
           プロフィール設定
         </h2>
       </div>
 
       <FamilyInvitations />
 
-      <Card>
+      <Card className="bg-yellow-50/80 border-yellow-200">
         <CardContent className="p-6 space-y-6">
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center">
+            <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center">
               <Heart className="w-10 h-10 text-white" />
             </div>
             <div>
-              <p className="font-semibold text-gray-700 text-lg">
+              <p className="font-semibold text-amber-800 text-lg">
                 {userType === 'parent' ? '保護者アカウント' : 'お子様アカウント'}
               </p>
-              <p className="text-sm text-gray-500">user@example.com</p>
+              <p className="text-sm text-amber-600">user@example.com</p>
             </div>
           </div>
 
           {/* Personal Information Section */}
-          <div className="pt-4 border-t">
+          <div className="pt-4 border-t border-yellow-300">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-700 text-lg">個人情報</h3>
+              <h3 className="font-semibold text-amber-800 text-lg">個人情報</h3>
               {!isEditingPersonalInfo ? (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setIsEditingPersonalInfo(true)}
-                  className="h-8 text-gray-600"
+                  className="h-8 text-amber-700 border-amber-300 hover:bg-amber-100"
                 >
                   <Edit className="w-4 h-4 mr-1" />
                   編集
@@ -126,7 +125,7 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
                     variant="outline"
                     size="sm"
                     onClick={handleCancelEdit}
-                    className="h-8 text-gray-600"
+                    className="h-8 text-amber-700 border-amber-300 hover:bg-amber-100"
                   >
                     <X className="w-4 h-4 mr-1" />
                     キャンセル
@@ -134,7 +133,7 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
                   <Button
                     size="sm"
                     onClick={handleSavePersonalInfo}
-                    className="h-8 bg-blue-600 hover:bg-blue-700"
+                    className="h-8 bg-amber-600 hover:bg-amber-700"
                   >
                     <Save className="w-4 h-4 mr-1" />
                     保存
@@ -145,7 +144,7 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
             
             <div className="space-y-4">
               <div>
-                <Label htmlFor="location" className="text-sm font-medium text-gray-700 mb-1 block">
+                <Label htmlFor="location" className="text-sm font-medium text-amber-800 mb-1 block">
                   住所
                 </Label>
                 {isEditingPersonalInfo ? (
@@ -154,17 +153,17 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
                     value={personalInfo.location}
                     onChange={(e) => setPersonalInfo(prev => ({ ...prev, location: e.target.value }))}
                     placeholder="東京都渋谷区..."
-                    className="h-10"
+                    className="h-10 border-yellow-300 focus:ring-amber-500"
                   />
                 ) : (
-                  <div className="h-10 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md flex items-center text-gray-600">
+                  <div className="h-10 px-3 py-2 bg-white/80 border border-yellow-200 rounded-md flex items-center text-amber-700">
                     {personalInfo.location || "未設定"}
                   </div>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="postalCode" className="text-sm font-medium text-gray-700 mb-1 block">
+                <Label htmlFor="postalCode" className="text-sm font-medium text-amber-800 mb-1 block">
                   郵便番号
                 </Label>
                 {isEditingPersonalInfo ? (
@@ -173,17 +172,17 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
                     value={personalInfo.postalCode}
                     onChange={(e) => setPersonalInfo(prev => ({ ...prev, postalCode: e.target.value }))}
                     placeholder="123-4567"
-                    className="h-10"
+                    className="h-10 border-yellow-300 focus:ring-amber-500"
                   />
                 ) : (
-                  <div className="h-10 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md flex items-center text-gray-600">
+                  <div className="h-10 px-3 py-2 bg-white/80 border border-yellow-200 rounded-md flex items-center text-amber-700">
                     {personalInfo.postalCode || "未設定"}
                   </div>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="phoneNumber" className="text-sm font-medium text-gray-700 mb-1 block">
+                <Label htmlFor="phoneNumber" className="text-sm font-medium text-amber-800 mb-1 block">
                   電話番号
                 </Label>
                 {isEditingPersonalInfo ? (
@@ -192,10 +191,10 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
                     value={personalInfo.phoneNumber}
                     onChange={(e) => setPersonalInfo(prev => ({ ...prev, phoneNumber: e.target.value }))}
                     placeholder="090-1234-5678"
-                    className="h-10"
+                    className="h-10 border-yellow-300 focus:ring-amber-500"
                   />
                 ) : (
-                  <div className="h-10 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md flex items-center text-gray-600">
+                  <div className="h-10 px-3 py-2 bg-white/80 border border-yellow-200 rounded-md flex items-center text-amber-700">
                     {personalInfo.phoneNumber || "未設定"}
                   </div>
                 )}
@@ -203,26 +202,26 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
             </div>
           </div>
 
-          <div className="pt-4 border-t">
-            <h3 className="font-semibold text-gray-700 mb-4 text-lg">家族の接続</h3>
+          <div className="pt-4 border-t border-yellow-300">
+            <h3 className="font-semibold text-amber-800 mb-4 text-lg">家族の接続</h3>
             <div className="space-y-3">
               {userType === 'parent' && (
                 <>
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center justify-between p-4 bg-white/80 rounded-xl border border-yellow-200">
                     <div>
-                      <p className="font-semibold text-gray-700">ゆき</p>
-                      <p className="text-sm text-gray-500">接続されたお子様</p>
+                      <p className="font-semibold text-amber-800">ゆき</p>
+                      <p className="text-sm text-amber-600">接続されたお子様</p>
                     </div>
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="h-10 text-gray-600" 
+                      className="h-10 text-amber-700 border-amber-300 hover:bg-amber-100" 
                       onClick={() => handleManageChild('ゆき')}
                     >
                       管理
                     </Button>
                   </div>
-                  <Button variant="outline" className="w-full h-12 text-gray-600" onClick={handleAddChild}>
+                  <Button variant="outline" className="w-full h-12 text-amber-700 border-amber-300 hover:bg-amber-100" onClick={handleAddChild}>
                     <UserPlus className="w-5 h-5 mr-2" />
                     お子様を追加
                   </Button>
@@ -230,7 +229,7 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
               )}
               
               {userType === 'child' && (
-                <Button variant="outline" className="w-full h-12 text-gray-600" onClick={handleAddParent}>
+                <Button variant="outline" className="w-full h-12 text-amber-700 border-amber-300 hover:bg-amber-100" onClick={handleAddParent}>
                   <Users className="w-5 h-5 mr-2" />
                   保護者を追加
                 </Button>
@@ -238,10 +237,10 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
             </div>
           </div>
 
-          <div className="pt-4 border-t space-y-3">
+          <div className="pt-4 border-t border-yellow-300 space-y-3">
             <Button 
               variant="outline" 
-              className="w-full justify-start h-12 text-base text-gray-600" 
+              className="w-full justify-start h-12 text-base text-amber-700 border-amber-300 hover:bg-amber-100" 
               onClick={() => setCurrentView('payment')}
             >
               <CreditCard className="w-5 h-5 mr-3" />
@@ -249,7 +248,7 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
             </Button>
             <Button 
               variant="outline" 
-              className="w-full justify-start h-12 text-base text-gray-600" 
+              className="w-full justify-start h-12 text-base text-amber-700 border-amber-300 hover:bg-amber-100" 
               onClick={() => setCurrentView('privacy')}
             >
               <Shield className="w-5 h-5 mr-3" />
@@ -257,13 +256,13 @@ export const ProfileTab = ({ userType, onSignOut }: ProfileTabProps) => {
             </Button>
             <Button 
               variant="outline" 
-              className="w-full justify-start h-12 text-base text-gray-600" 
+              className="w-full justify-start h-12 text-base text-amber-700 border-amber-300 hover:bg-amber-100" 
               onClick={() => setCurrentView('notifications')}
             >
               <Bell className="w-5 h-5 mr-3" />
               通知設定
             </Button>
-            <Button variant="outline" className="w-full justify-start h-12 text-base text-red-600 hover:text-red-700" onClick={onSignOut}>
+            <Button variant="outline" className="w-full justify-start h-12 text-base text-red-600 hover:text-red-700 border-red-300 hover:bg-red-50" onClick={onSignOut}>
               <LogOut className="w-5 h-5 mr-3" />
               ログアウト
             </Button>
