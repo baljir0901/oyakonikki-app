@@ -2,11 +2,17 @@
 import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/AuthForm";
 import { DashboardView } from "@/components/DashboardView";
+import { SplashScreen } from "@/components/SplashScreen";
 import { useState } from "react";
 
 const Index = () => {
   const { user, loading } = useAuth();
   const [userType, setUserType] = useState<'parent' | 'child'>('parent');
+  const [showSplash, setShowSplash] = useState(true);
+
+  if (showSplash) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
 
   if (loading) {
     return (
