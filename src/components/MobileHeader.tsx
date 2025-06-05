@@ -1,4 +1,3 @@
-
 import { Heart, Sun, Users, Bell, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -35,7 +34,7 @@ export const MobileHeader = ({ userType }: MobileHeaderProps) => {
               onClick={() => setShowNotifications(!showNotifications)}
               className="text-amber-700 hover:bg-amber-100 relative"
             >
-              <Bell className="w-4 h-4" />
+              <Bell className="w-6 h-6" />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs"></span>
             </Button>
             
