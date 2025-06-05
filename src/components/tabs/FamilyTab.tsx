@@ -63,12 +63,18 @@ export const FamilyTab = ({ userType }: FamilyTabProps) => {
       relationships?.forEach(rel => {
         if (rel.parent_id === user.id && rel.child) {
           members.push({
-            ...rel.child,
+            id: rel.child.id,
+            full_name: rel.child.full_name,
+            email: rel.child.email,
+            avatar_url: rel.child.avatar_url,
             relationship_type: 'child'
           });
         } else if (rel.child_id === user.id && rel.parent) {
           members.push({
-            ...rel.parent,
+            id: rel.parent.id,
+            full_name: rel.parent.full_name,
+            email: rel.parent.email,
+            avatar_url: rel.parent.avatar_url,
             relationship_type: 'parent'
           });
         }
@@ -118,7 +124,7 @@ export const FamilyTab = ({ userType }: FamilyTabProps) => {
       });
 
       setInviteEmail('');
-      fetchFamilyData(); // Refresh data
+      fetchFamilyData();
     } catch (error) {
       console.error('Error sending invitation:', error);
       toast({
