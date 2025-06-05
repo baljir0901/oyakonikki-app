@@ -96,27 +96,27 @@ export const EmailAuthForm = ({
     <>
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-base">メールアドレス</Label>
+          <Label htmlFor="email" className="text-sm text-gray-700">メールアドレス</Label>
           <Input
             id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="メールアドレスを入力"
-            className="h-12 text-base"
+            className="h-10 text-sm border-gray-300 rounded-md"
             required
           />
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-base">パスワード</Label>
+          <Label htmlFor="password" className="text-sm text-gray-700">パスワード</Label>
           <Input
             id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="パスワードを入力"
-            className="h-12 text-base"
+            className="h-10 text-sm border-gray-300 rounded-md"
             required
           />
           {isLogin && (
@@ -163,7 +163,7 @@ export const EmailAuthForm = ({
         <Button 
           type="submit" 
           disabled={loading}
-          className="w-full h-12 bg-purple-600 hover:bg-purple-700 text-white text-base font-semibold rounded-full transition"
+          className="w-full h-10 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md transition"
         >
           {loading ? "処理中..." : (isLogin ? "ログイン" : "新規登録")}
         </Button>

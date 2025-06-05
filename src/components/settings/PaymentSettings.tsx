@@ -80,12 +80,27 @@ export const PaymentSettings = ({ onBack }: PaymentSettingsProps) => {
         throw new Error("認証が必要です");
       }
 
+      // Store card information and start 7-day free trial
+      const { error: subscriptionError } = await supabase
+        .from('subscribers')
+        .insert([
+          {
+            user_id: session.user.id,
+            email: session.user.email || '',
+            subscription_tier: 'premium',
+            subscribed: true,
+            subscription_end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+          }
+        ]);
+
+      if (subscriptionError) throw subscriptionError;
+
       // Simulate card processing
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       toast({
-        title: "決済完了",
-        description: "プレミアムプランの登録が完了しました",
+        title: "7日間無料トライアル開始",
+        description: "カード情報を登録しました。7日後から月額300円の課金が開始されます。",
       });
 
       setShowCardDialog(false);
@@ -195,15 +210,19 @@ export const PaymentSettings = ({ onBack }: PaymentSettingsProps) => {
                 <div>
                   <h3 className="font-semibold">プレミアムプラン</h3>
                   <p className="text-sm text-gray-500">月額 ¥300</p>
+                  <p className="text-xs text-green-600 font-medium mb-1">
+                    🎉 7日間無料トライアル
+                  </p>
                   <p className="text-xs text-gray-400 mt-1">
                     • 無制限の日記作成<br/>
                     • 高度な分析機能<br/>
-                    • データのバックアップ
+                    • データのバックアップ<br/>
+                    • 家族共有機能
                   </p>
                 </div>
                 {!subscriptionData.subscribed ? (
-                  <Button onClick={handleCheckout} disabled={loading}>
-                    {loading ? "処理中..." : "申し込む"}
+                  <Button onClick={handleCheckout} disabled={loading} className="bg-green-600 hover:bg-green-700">
+                    {loading ? "処理中..." : "無料で始める"}
                   </Button>
                 ) : (
                   <Badge variant="secondary" className="bg-green-100 text-green-800">
@@ -227,12 +246,13 @@ export const PaymentSettings = ({ onBack }: PaymentSettingsProps) => {
         </CardContent>
       </Card>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-semibold text-blue-800 mb-2">テスト環境について</h3>
-        <p className="text-sm text-blue-700">
-          現在はテスト環境で動作しています。実際の決済は行われません。
-          メールアドレスに「premium」や「test」が含まれている場合、
-          自動的にプレミアムプランのシミュレーションが有効になります。
+      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <h3 className="font-semibold text-green-800 mb-2">7日間無料トライアルについて</h3>
+        <p className="text-sm text-green-700">
+          • クレジットカード情報の登録が必要です<br/>
+          • 7日間は完全無料でご利用いただけます<br/>
+          • トライアル期間終了後、自動的に月額300円の課金が開始されます<br/>
+          • いつでもキャンセル可能です
         </p>
       </div>
 

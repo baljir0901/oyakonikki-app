@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/AuthForm";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
-import { isAdminDomain } from "@/config/domains";
 import Index from "./pages/Index";
 
 const queryClient = new QueryClient();
@@ -34,7 +33,7 @@ const App = () => {
       setIsAuthenticated(!!session);
       
       // Check if admin domain
-      if (isAdminDomain()) {
+      if (window.location.hostname === 'admin-oyakonikki.netlify.app') {
         setUserType('parent');
       }
     } catch (error) {
@@ -52,6 +51,8 @@ const App = () => {
     );
   }
 
+  const isAdminDomain = window.location.hostname === 'admin-oyakonikki.netlify.app';
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -59,7 +60,7 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
-            {isAdminDomain() ? (
+            {isAdminDomain ? (
               <>
                 <Route 
                   path="/" 
