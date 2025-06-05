@@ -47,13 +47,14 @@ export const FamilyTab = ({ userType }: FamilyTabProps) => {
     if (!user) return;
 
     try {
-      // Fetch family relationships
+      // Fetch family relationships with proper join syntax
       const { data: relationships, error: relError } = await supabase
         .from('family_relationships')
         .select(`
-          *,
-          parent:profiles!family_relationships_parent_id_fkey(id, full_name, email, avatar_url),
-          child:profiles!family_relationships_child_id_fkey(id, full_name, email, avatar_url)
+          parent_id,
+          child_id,
+          parent:parent_id(id, full_name, email, avatar_url),
+          child:child_id(id, full_name, email, avatar_url)
         `)
         .or(`parent_id.eq.${user.id},child_id.eq.${user.id}`);
 
@@ -61,19 +62,19 @@ export const FamilyTab = ({ userType }: FamilyTabProps) => {
 
       const members: FamilyMember[] = [];
       relationships?.forEach(rel => {
-        if (rel.parent_id === user.id && rel.child) {
+        if (rel.parent_id === user.id && rel.child && typeof rel.child === 'object') {
           members.push({
             id: rel.child.id,
-            full_name: rel.child.full_name,
-            email: rel.child.email,
+            full_name: rel.child.full_name || '',
+            email: rel.child.email || '',
             avatar_url: rel.child.avatar_url,
             relationship_type: 'child'
           });
-        } else if (rel.child_id === user.id && rel.parent) {
+        } else if (rel.child_id === user.id && rel.parent && typeof rel.parent === 'object') {
           members.push({
             id: rel.parent.id,
-            full_name: rel.parent.full_name,
-            email: rel.parent.email,
+            full_name: rel.parent.full_name || '',
+            email: rel.parent.email || '',
             avatar_url: rel.parent.avatar_url,
             relationship_type: 'parent'
           });
