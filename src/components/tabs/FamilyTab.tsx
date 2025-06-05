@@ -53,8 +53,8 @@ export const FamilyTab = ({ userType }: FamilyTabProps) => {
         .select(`
           parent_id,
           child_id,
-          parent:parent_id(id, full_name, email, avatar_url),
-          child:child_id(id, full_name, email, avatar_url)
+          parent:profiles!parent_id(id, full_name, email, avatar_url),
+          child:profiles!child_id(id, full_name, email, avatar_url)
         `)
         .or(`parent_id.eq.${user.id},child_id.eq.${user.id}`);
 
@@ -62,20 +62,20 @@ export const FamilyTab = ({ userType }: FamilyTabProps) => {
 
       const members: FamilyMember[] = [];
       relationships?.forEach(rel => {
-        if (rel.parent_id === user.id && rel.child && typeof rel.child === 'object') {
+        if (rel.parent_id === user.id && rel.child && typeof rel.child === 'object' && !Array.isArray(rel.child)) {
           members.push({
             id: rel.child.id,
             full_name: rel.child.full_name || '',
             email: rel.child.email || '',
-            avatar_url: rel.child.avatar_url,
+            avatar_url: rel.child.avatar_url || undefined,
             relationship_type: 'child'
           });
-        } else if (rel.child_id === user.id && rel.parent && typeof rel.parent === 'object') {
+        } else if (rel.child_id === user.id && rel.parent && typeof rel.parent === 'object' && !Array.isArray(rel.parent)) {
           members.push({
             id: rel.parent.id,
             full_name: rel.parent.full_name || '',
             email: rel.parent.email || '',
-            avatar_url: rel.parent.avatar_url,
+            avatar_url: rel.parent.avatar_url || undefined,
             relationship_type: 'parent'
           });
         }
@@ -110,19 +110,56 @@ export const FamilyTab = ({ userType }: FamilyTabProps) => {
 
     setInviting(true);
     try {
-      const { error } = await supabase.functions.invoke('send-family-invitation', {
-        body: {
+      // First create the invitation record
+      const { data: invitationData, error: invitationError } = await supabase
+        .from('family_invitations')
+        .insert({
+          inviter_id: user.id,
           invitee_email: inviteEmail.trim(),
-          inviter_role: userType,
+          relationship_type: 'parent_child',
+          inviter_role: userType
+        })
+        .select()
+        .single();
+
+      if (invitationError) throw invitationError;
+
+      // Get user profile for name
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+      }
+
+      const inviterName = profileData?.full_name || 'ユーザー';
+
+      // Send invitation email via edge function
+      const { error: emailError } = await supabase.functions.invoke('send-family-invitation', {
+        body: {
+          invitationId: invitationData.id,
+          inviteeEmail: inviteEmail.trim(),
+          inviterName: inviterName,
+          inviterRole: userType,
+          invitationCode: invitationData.invitation_code
         }
       });
 
-      if (error) throw error;
-
-      toast({
-        title: "招待を送信しました",
-        description: `${inviteEmail} に家族招待を送信しました`,
-      });
+      if (emailError) {
+        console.error('Error sending invitation email:', emailError);
+        toast({
+          title: "招待を作成しました",
+          description: `招待コード: ${invitationData.invitation_code}（メール送信に失敗しましたが、招待コードを直接お伝えください）`,
+        });
+      } else {
+        toast({
+          title: "招待を送信しました",
+          description: `${inviteEmail} に家族招待を送信しました`,
+        });
+      }
 
       setInviteEmail('');
       fetchFamilyData();
