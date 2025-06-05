@@ -1,5 +1,5 @@
 
-import { Heart, BookOpen, Calendar, Users } from "lucide-react";
+import { Heart, BookOpen, Calendar, Users, UserCircle } from "lucide-react";
 
 interface MobileNavigationProps {
   activeTab: string;
@@ -9,9 +9,10 @@ interface MobileNavigationProps {
 export const MobileNavigation = ({ activeTab, setActiveTab }: MobileNavigationProps) => {
   const tabs = [
     { id: 'home', icon: Heart, label: 'ホーム', color: 'from-red-400 to-pink-500' },
-    { id: 'write', icon: BookOpen, label: '日記を書く', color: 'from-amber-400 to-yellow-500' },
+    { id: 'write', icon: BookOpen, label: '日記', color: 'from-amber-400 to-yellow-500' },
     { id: 'calendar', icon: Calendar, label: 'カレンダー', color: 'from-orange-400 to-amber-500' },
-    { id: 'profile', icon: Users, label: 'プロフィール', color: 'from-yellow-400 to-orange-500' }
+    { id: 'family', icon: Users, label: '家族', color: 'from-green-400 to-emerald-500' },
+    { id: 'profile', icon: UserCircle, label: 'プロフィール', color: 'from-blue-400 to-cyan-500' }
   ];
 
   return (
@@ -22,7 +23,7 @@ export const MobileNavigation = ({ activeTab, setActiveTab }: MobileNavigationPr
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative flex flex-col items-center py-2 px-2 rounded-xl transition-all duration-300 min-w-0 flex-1 group ${
+              className={`relative flex flex-col items-center py-2 px-1 rounded-xl transition-all duration-300 min-w-0 flex-1 group ${
                 activeTab === tab.id
                   ? 'text-white scale-105 shadow-md'
                   : 'text-amber-600 hover:text-amber-800 active:bg-amber-50 hover:scale-102'
